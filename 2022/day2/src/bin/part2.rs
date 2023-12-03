@@ -1,8 +1,6 @@
 use std::str::FromStr;
 
-use common::GetRoundResult;
-
-use crate::common::{GameItems, RoundResult};
+use common::{GameItems, GetRoundResult, RoundResult};
 
 mod common;
 
