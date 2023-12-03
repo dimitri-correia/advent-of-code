@@ -1,3 +1,5 @@
+mod common;
+
 fn main() {
     let input = include_str!("./input1.txt");
     let output = part_1(input);
@@ -6,7 +8,10 @@ fn main() {
 
 fn part_1(input: &str) -> String {
     dbg!(input);
-    "".to_string()
+    let items_calo_per_elves = common::get_calo_per_elf(input);
+    dbg!(&items_calo_per_elves);
+    let max_calo = items_calo_per_elves.iter().max().unwrap();
+    max_calo.to_string()
 }
 
 #[cfg(test)]
