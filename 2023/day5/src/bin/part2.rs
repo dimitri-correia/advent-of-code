@@ -1,3 +1,9 @@
+use common::{get_maps, get_min_location};
+
+use crate::common::Part::Part2;
+
+mod common;
+
 fn main() {
     let input = include_str!("./input1.txt"); //same
     let output = part_2(input);
@@ -5,7 +11,11 @@ fn main() {
 }
 
 fn part_2(input: &str) -> String {
-    "".to_string()
+    dbg!(input);
+    let input = get_maps(input, Part2);
+    let res = get_min_location(input);
+
+    res.to_string()
 }
 
 #[cfg(test)]
@@ -16,6 +26,6 @@ mod tests {
     fn it_works() {
         let input = include_str!("./input1_ex.txt"); // same
         let r = part_2(input);
-        assert_eq!("", r);
+        assert_eq!("46", r);
     }
 }

@@ -1,6 +1,11 @@
 use std::cmp::min;
 use std::str::Lines;
 
+pub enum Part {
+    Part1,
+    Part2,
+}
+
 #[derive(Debug)]
 pub struct MapD {
     destination_range_start: usize,
@@ -10,7 +15,7 @@ pub struct MapD {
 
 #[derive(Debug)]
 pub struct Input {
-    seeds: Vec<usize>,
+    pub seeds: Vec<usize>,
     seed_to_soil: Vec<MapD>,
     soil_to_fertilizer: Vec<MapD>,
     fertilizer_to_water: Vec<MapD>,
@@ -50,7 +55,7 @@ pub fn get_min_location(input: Input) -> usize {
     res
 }
 
-pub fn get_maps(input: &str) -> Input {
+pub fn get_maps(input: &str, part: Part) -> Input {
     let mut lines = input.lines();
 
     let seeds: Vec<usize> = lines
@@ -62,6 +67,24 @@ pub fn get_maps(input: &str) -> Input {
         .split_whitespace()
         .map(|n| n.parse::<usize>().unwrap())
         .collect();
+
+    let seeds: Vec<usize> = match part {
+        Part::Part1 => seeds,
+        Part::Part2 => {
+            let mut new_seeds = vec![];
+            for chunk in seeds.chunks(2) {
+                match chunk {
+                    &[start, range] => {
+                        for s in start..start + range {
+                            new_seeds.push(s);
+                        }
+                    }
+                    _ => panic!(),
+                }
+            }
+            new_seeds
+        }
+    };
 
     let mut seed_to_soil: Vec<MapD> = vec![];
     let mut soil_to_fertilizer: Vec<MapD> = vec![];
