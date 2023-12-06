@@ -57,17 +57,14 @@ pub fn get_min_location_p_1(input: Input) -> usize {
 }
 
 pub fn get_min_location_p_2(input: Input) -> usize {
-    let mut res = usize::MAX;
-
-    let mut vec_number = vec![];
-    for chunk in input.seeds.chunks(2) {
-        match chunk {
-            &[start, range] => {
-                vec_number.push(start..start + range);
-            }
+    let mut vec_number: Vec<_> = input
+        .seeds
+        .chunks(2)
+        .map(|chunk| match chunk {
+            [start, range] => start..&(start + range),
             _ => panic!(),
-        }
-    }
+        })
+        .collect();
 
     for map in [
         &input.seed_to_soil,
@@ -80,46 +77,44 @@ pub fn get_min_location_p_2(input: Input) -> usize {
     ]
     .iter()
     {
-        let mut new_vec_number = vec![];
-        while !vec_number.is_empty() {
+        let mut new_vec_number = Vec::new();
+        while let Some(seed) = vec_number.pop() {
             // filter with get_range_intersection
             // option is can use m.destination_range_start - m.source_range_start
             // other have to be put back in vec_number to be processed again
             // when empty we go for next map
 
-            let seed = vec_number.pop().unwrap();
+            let mut seed = seed;
 
-            let count = map
-                .iter()
-                .find(|m| {
-                    // map is all seed_to_soil then all soil_to_fertilizer then ...
-                    let (inter, mut outside) = get_range_intersection(
-                        &seed,
-                        &(m.source_range_start..m.source_range_start + m.range_length),
-                    );
-                    if inter.is_some() {
-                        let start =
-                            inter.unwrap().start + m.destination_range_start - m.source_range_start;
-                        let end =
-                            inter.unwrap().end + m.destination_range_start - m.source_range_start;
-                        new_vec_number.push(start..end);
-                        vec_number.append(&mut outside);
-                    };
-                    !inter.is_some()
-                })
-                .count();
+            for m in map.iter() {
+                // map is all seed_to_soil then all soil_to_fertilizer then ...
+                let (inter, mut outside) = get_range_intersection(
+                    &seed,
+                    &(m.source_range_start..m.source_range_start + m.range_length),
+                );
+
+                if let Some(inter) = inter {
+                    let start = inter.start + m.destination_range_start - m.source_range_start;
+                    let end = inter.end + m.destination_range_start - m.source_range_start;
+                    new_vec_number.push(start..end);
+                    vec_number.append(&mut outside);
+                    continue;
+                }
+
+                seed = outside.pop().unwrap_or(seed);
+            }
             // if no inter, we keep the same range
-            if count == 0 {
+            if new_vec_number.is_empty() {
                 new_vec_number.push(seed);
             }
         }
         vec_number = new_vec_number;
     }
-    res
+    vec_number.iter().map(|range| range.start).min().unwrap()
 }
 
 fn get_range_intersection(
-    range1: &Range<usize>,
+    range1: Range<usize>,
     range2: &Range<usize>,
 ) -> (Option<Range<usize>>, Vec<Range<usize>>) {
     let intersection_start = range1.start.max(range2.start);
