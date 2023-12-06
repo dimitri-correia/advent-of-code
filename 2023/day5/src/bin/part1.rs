@@ -1,6 +1,5 @@
-use common::{get_maps, get_min_location};
-
-use crate::common::Part::Part1;
+use common::get_maps;
+use common::get_min_location_p_1;
 
 mod common;
 
@@ -12,9 +11,9 @@ fn main() {
 
 fn part_1(input: &str) -> String {
     dbg!(input);
-    let input = get_maps(input, Part1);
+    let input = get_maps(input);
 
-    let res = get_min_location(input);
+    let res = get_min_location_p_1(input);
 
     res.to_string()
 }

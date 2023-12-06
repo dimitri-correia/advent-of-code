@@ -1,4 +1,5 @@
 use std::cmp::min;
+use std::ops::Range;
 use std::str::Lines;
 
 pub enum Part {
@@ -25,11 +26,11 @@ pub struct Input {
     humidity_to_location: Vec<MapD>,
 }
 
-pub fn get_min_location(input: Input) -> usize {
+pub fn get_min_location_p_1(input: Input) -> usize {
     let mut res = usize::MAX;
 
     for mut seed in input.seeds {
-        dbg!(&seed);
+        //dbg!(&seed);
         for map in [
             &input.seed_to_soil,
             &input.soil_to_fertilizer,
@@ -49,13 +50,92 @@ pub fn get_min_location(input: Input) -> usize {
                 _ => seed,
             };
         }
-        dbg!(seed);
+        //dbg!(seed);
         res = min(res, seed);
     }
     res
 }
 
-pub fn get_maps(input: &str, part: Part) -> Input {
+pub fn get_min_location_p_2(input: Input) -> usize {
+    let mut res = usize::MAX;
+
+    let mut vec_number = vec![];
+    for chunk in input.seeds.chunks(2) {
+        match chunk {
+            &[start, range] => {
+                vec_number.push(start..start + range);
+            }
+            _ => panic!(),
+        }
+    }
+
+    for map in [
+        &input.seed_to_soil,
+        &input.soil_to_fertilizer,
+        &input.fertilizer_to_water,
+        &input.water_to_light,
+        &input.light_to_temperature,
+        &input.temperature_to_humidity,
+        &input.humidity_to_location,
+    ]
+    .iter()
+    {
+        let mut new_vec_number = vec![];
+        while !vec_number.is_empty() {
+            // filter with get_range_intersection
+            // option is can use m.destination_range_start - m.source_range_start
+            // other have to be put back in vec_number to be processed again
+            // when empty we go for next map
+
+            let seed = vec_number.pop().unwrap();
+
+            let count = map
+                .iter()
+                .find(|m| {
+                    // map is all seed_to_soil then all soil_to_fertilizer then ...
+                    let (inter, mut outside) = get_range_intersection(
+                        &seed,
+                        &(m.source_range_start..m.source_range_start + m.range_length),
+                    );
+                    if inter.is_some() {
+                        let start =
+                            inter.unwrap().start + m.destination_range_start - m.source_range_start;
+                        let end =
+                            inter.unwrap().end + m.destination_range_start - m.source_range_start;
+                        new_vec_number.push(start..end);
+                        vec_number.append(&mut outside);
+                    };
+                    !inter.is_some()
+                })
+                .count();
+            // if no inter, we keep the same range
+            if count == 0 {
+                new_vec_number.push(seed);
+            }
+        }
+        vec_number = new_vec_number;
+    }
+    res
+}
+
+fn get_range_intersection(
+    range1: &Range<usize>,
+    range2: &Range<usize>,
+) -> (Option<Range<usize>>, Vec<Range<usize>>) {
+    let intersection_start = range1.start.max(range2.start);
+    let intersection_end = range1.end.min(range2.end);
+
+    let mut outside: Vec<Range<usize>> = vec![];
+
+    if intersection_start <= intersection_end {
+        return (Some(intersection_start..intersection_end), outside);
+    } else {
+        outside.push(range1);
+        return (None, outside);
+    }
+}
+
+pub fn get_maps(input: &str) -> Input {
     let mut lines = input.lines();
 
     let seeds: Vec<usize> = lines
@@ -67,24 +147,6 @@ pub fn get_maps(input: &str, part: Part) -> Input {
         .split_whitespace()
         .map(|n| n.parse::<usize>().unwrap())
         .collect();
-
-    let seeds: Vec<usize> = match part {
-        Part::Part1 => seeds,
-        Part::Part2 => {
-            let mut new_seeds = vec![];
-            for chunk in seeds.chunks(2) {
-                match chunk {
-                    &[start, range] => {
-                        for s in start..start + range {
-                            new_seeds.push(s);
-                        }
-                    }
-                    _ => panic!(),
-                }
-            }
-            new_seeds
-        }
-    };
 
     let mut seed_to_soil: Vec<MapD> = vec![];
     let mut soil_to_fertilizer: Vec<MapD> = vec![];
