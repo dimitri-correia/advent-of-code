@@ -14,8 +14,8 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let input = include_str!("./input1_ex.txt"); // same
+        let input = include_str!("./input2_ex.txt");
         let r = part_2(input);
-        assert_eq!("", r);
+        assert_eq!("6", r);
     }
 }
