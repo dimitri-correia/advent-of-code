@@ -38,8 +38,8 @@ fn read_input(input: &str) -> (&str, HashMap<String, MapLine>) {
     let mut map = HashMap::new();
 
     for line in lines {
-        let (pos_actuelle, map_line) = parse_line(line);
-        map.insert(pos_actuelle, map_line);
+        let (actual_pos, map_line) = parse_line(line);
+        map.insert(actual_pos, map_line);
     }
     (pattern, map)
 }
@@ -56,12 +56,12 @@ fn parse_line(input: &str) -> (String, MapLine) {
         .filter(|&c| c.is_alphanumeric() || c == ',' || c == '=')
         .collect();
     let parts: Vec<&str> = cleaned_input.split('=').collect();
-    let pos_actuelle = parts[0].trim().to_string();
+    let actual_pos = parts[0].trim().to_string();
     let parts: Vec<&str> = parts[1].split(',').collect();
     let left = parts[0].trim().to_string();
     let right = parts[1].trim().to_string();
 
-    (pos_actuelle, MapLine { left, right })
+    (actual_pos, MapLine { left, right })
 }
 
 #[cfg(test)]
