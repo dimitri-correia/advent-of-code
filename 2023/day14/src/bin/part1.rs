@@ -21,18 +21,14 @@ fn get_val_col(col: Vec<Shape>) -> usize {
     let mut last_non_cube_rock = len;
     for (idx, shape) in col.iter().enumerate() {
         if shape == &Shape::CubeRock {
-            for i in last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock {
-                r += i;
-            }
+            r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
             curr_rounded_tot = 0;
             last_non_cube_rock = len - idx - 1;
         } else if shape == &RoundedRock {
             curr_rounded_tot += 1;
         }
     }
-    for i in last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock {
-        r += i;
-    }
+    r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
     dbg!(&r);
     r
 }
