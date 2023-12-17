@@ -5,6 +5,27 @@ fn main() {
 }
 
 fn part_1(input: &str) -> String {
+    let (lines_vec, start_pos) = read_input(input);
+
+    let mut pass = vec![start_pos];
+    let mut pos = first_pipe(&start_pos, &lines_vec);
+
+    loop {
+        pass.push(pos);
+        let opt_pos = get_next(&pos, &pass, &lines_vec);
+
+        if opt_pos.is_none() {
+            break;
+        }
+
+        pos = opt_pos.unwrap();
+    }
+    dbg!(&pass);
+
+    (pass.len() / 2).to_string()
+}
+
+fn read_input(input: &str) -> (Vec<Vec<Pipe>>, (usize, usize)) {
     let mut lines_vec = vec![];
     let mut start_pos: (usize, usize) = (0, 0);
     for (l_idx, line) in input.lines().enumerate() {
@@ -20,30 +41,7 @@ fn part_1(input: &str) -> String {
     }
 
     dbg!(start_pos);
-
-    let mut pass = vec![start_pos];
-    let mut pos = first_pipe(&start_pos, &lines_vec);
-
-    dbg!(&pos);
-    dbg!(&pass);
-
-    let mut i = 0;
-    loop {
-        pass.push(pos);
-        pos = get_next(&pos, &pass, &lines_vec);
-        dbg!(&pos);
-
-        if pos == start_pos {
-            break;
-        }
-        i += 1;
-        if i == 4 {
-            break;
-        }
-    }
-    dbg!(pass);
-
-    "".to_string()
+    (lines_vec, start_pos)
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -92,32 +90,50 @@ fn parse_char_to_pipe(c: char) -> Pipe {
 }
 
 fn first_pipe(pos: &(usize, usize), lines_vec: &[Vec<Pipe>]) -> (usize, usize) {
-    for &(v, h) in &[
-        (1, 0),
-        (-1, 0),
-        (0, 1),
-        (0, -1),
-        (1, 1),
-        (1, -1),
-        (-1, 1),
-        (-1, -1),
-    ] {
-        let x = (pos.0 as isize + v) as usize;
-        let y = (pos.1 as isize + h) as usize;
+    let mut adjacent_pipes = vec![];
+    for &(v, h) in &[(1, 0), (-1, 0), (0, 1), (0, -1)] {
+        let x = pos.0 as isize + v;
+        let y = pos.1 as isize + h;
+        if x < 0 || x > lines_vec.len() as isize || y < 0 || y > lines_vec[0].len() as isize {
+            continue;
+        }
+        let x = x as usize;
+        let y = y as usize;
         let pipe = &lines_vec[x][y];
         if pipe == &Pipe::Ground {
             continue;
         }
-        return (x, y);
+        let (a, b) = get_two_next_possible_pipes(&&(x, y), &lines_vec);
+        if &a == pos || &b == pos {
+            adjacent_pipes.push(((x, y), pipe));
+        }
     }
-    *pos
+    dbg!(&adjacent_pipes);
+    if adjacent_pipes.len() != 2 {
+        panic!("more than 2 adjacent pipe at the start");
+    }
+    adjacent_pipes.pop().unwrap().0
 }
 
 fn get_next(
     pos: &(usize, usize),
     pass: &[(usize, usize)],
     lines_vec: &[Vec<Pipe>],
-) -> (usize, usize) {
+) -> Option<(usize, usize)> {
+    let (f, l) = get_two_next_possible_pipes(&pos, &lines_vec);
+    if pass.contains(&f) {
+        if pass.contains(&l) {
+            return None;
+        }
+        return Some(l);
+    }
+    Some(f)
+}
+
+fn get_two_next_possible_pipes(
+    pos: &&(usize, usize),
+    lines_vec: &&[Vec<Pipe>],
+) -> ((usize, usize), (usize, usize)) {
     let pipe = &lines_vec[pos.0][pos.1];
     let (a, b) = get_positions(pipe);
     let f = (
@@ -128,13 +144,7 @@ fn get_next(
         (b.0 + pos.0 as isize) as usize,
         (b.1 + pos.1 as isize) as usize,
     );
-    dbg!(f, l);
-    dbg!(pass.last());
-    if f == *pass.last().unwrap() {
-        l
-    } else {
-        f
-    }
+    (f, l)
 }
 
 #[cfg(test)]
