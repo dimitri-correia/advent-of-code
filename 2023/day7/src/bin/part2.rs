@@ -148,8 +148,6 @@ fn get_total_winnings(input: &str) -> usize {
 
     for (idx, (_, bid)) in hands.iter().enumerate() {
         let idx = idx + 1;
-        dbg!(bid);
-        dbg!(idx);
         res += idx * bid;
     }
 
@@ -157,26 +155,7 @@ fn get_total_winnings(input: &str) -> usize {
 }
 
 fn get_kind_hand(hand_string: String) -> PokerHand {
-    let mut char_count: HashMap<char, i32> = HashMap::new();
-
-    for c in hand_string.chars() {
-        let counter = char_count.entry(c).or_insert(0);
-        *counter += 1;
-    }
-
-    let mut ordered_char_count: Vec<(char, i32)> = char_count.into_iter().collect();
-    ordered_char_count.sort_by_key(|&(_, count)| -count);
-
-    if let Some(&('J', v)) = ordered_char_count.iter().find(|(c, _)| c == &'J') {
-        dbg!(v);
-        if ordered_char_count[0].0 != 'J' {
-            ordered_char_count[0].1 += v;
-        } else if ordered_char_count.len() == 1 {
-            ordered_char_count = vec![('A', 5)];
-        } else {
-            ordered_char_count[1].1 += v;
-        }
-    }
+    let ordered_char_count = get_ordered_char_count(&hand_string);
 
     let cards: Vec<Card> = hand_string.chars().map(Card::from).collect();
 
@@ -202,6 +181,37 @@ fn get_kind_hand(hand_string: String) -> PokerHand {
     }
 
     PokerHand::HighCard(cards)
+}
+
+fn get_ordered_char_count(hand_string: &String) -> Vec<(char, i32)> {
+    let mut char_count: HashMap<char, i32> = HashMap::new();
+
+    for c in hand_string.chars() {
+        let counter = char_count.entry(c).or_insert(0);
+        *counter += 1;
+    }
+
+    let mut ordered_char_count: Vec<(char, i32)> = char_count.into_iter().collect();
+    ordered_char_count.sort_by_key(|&(_, count)| -count);
+
+    if let Some(&('J', v)) = ordered_char_count.iter().find(|(c, _)| c == &'J') {
+        // dbg!(v, &ordered_char_count);
+        for i in ordered_char_count.iter_mut() {
+            if i.0 != 'J' {
+                i.1 += v;
+                for i in ordered_char_count.iter_mut() {
+                    if i.0 == 'J' {
+                        i.1 = 0
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    ordered_char_count.sort_by_key(|&(_, count)| -count);
+
+    ordered_char_count
 }
 
 fn main() {
