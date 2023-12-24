@@ -9,7 +9,6 @@ fn main() {
 }
 
 fn part_2(input: &str) -> String {
-    //dbg!(input);
     let input = get_maps(input);
     let res = get_min_location_p_2(input);
 
