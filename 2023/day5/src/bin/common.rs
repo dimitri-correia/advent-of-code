@@ -57,14 +57,7 @@ pub fn get_min_location_p_1(input: Input) -> usize {
 }
 
 pub fn get_min_location_p_2(input: Input) -> usize {
-    let mut vec_number: Vec<Range<usize>> = input
-        .seeds
-        .chunks(2)
-        .map(|chunk| match chunk {
-            [start, range] => *start..(*start + *range),
-            _ => panic!(),
-        })
-        .collect();
+    let mut vec_number = init_vec(&input);
 
     dbg!(&vec_number);
 
@@ -81,69 +74,68 @@ pub fn get_min_location_p_2(input: Input) -> usize {
     {
         dbg!(&map);
         let mut new_vec_number = Vec::new();
-        while let Some(range) = vec_number.pop() {
-            // filter with get_range_intersection
-            // option is can use m.destination_range_start - m.source_range_start
-            // other have to be put back in vec_number to be processed again
-            // when empty we go for next map
-            dbg!(&range);
-
-            let mut range = range;
-
+        'rng: while let Some(range) = vec_number.pop() {
             for m in map.iter() {
-                // map is all seed_to_soil then all soil_to_fertilizer then ...
-                let (inter, mut outside) = get_range_intersection(
-                    range.clone(),
+                let (inter, mut outside) = get_range_intersection_left_all(
+                    &range,
                     &(m.source_range_start..m.source_range_start + m.range_length),
                 );
-
-                dbg!(&inter, &outside);
 
                 if let Some(inter) = inter {
                     let start = inter.start + m.destination_range_start - m.source_range_start;
                     let end = inter.end + m.destination_range_start - m.source_range_start;
                     new_vec_number.push(start..end);
-                    continue;
+                    vec_number.append(&mut outside);
+                    continue 'rng;
                 }
-
-                let new_range = outside.pop().unwrap_or(range);
-
-                range = new_range;
             }
-            // if no inter, we keep the same range
-            if new_vec_number.is_empty() {
-                new_vec_number.push(range);
-            }
+            new_vec_number.push(range);
         }
-        // step end, we start the new one
         vec_number = new_vec_number;
         dbg!(&vec_number);
     }
 
-    vec_number.iter().map(|range| range.start).min().unwrap()
+    vec_number
+        .iter()
+        .filter(|rng| rng != &&Range { start: 0, end: 0 })
+        .map(|range| range.start)
+        .min()
+        .unwrap()
 }
 
-fn get_range_intersection(
-    range1: Range<usize>,
+fn init_vec(input: &Input) -> Vec<Range<usize>> {
+    input
+        .seeds
+        .chunks(2)
+        .map(|chunk| match chunk {
+            [start, range] => *start..(*start + *range),
+            _ => panic!(),
+        })
+        .collect()
+}
+
+fn get_range_intersection_left_all(
+    range1: &Range<usize>,
     range2: &Range<usize>,
 ) -> (Option<Range<usize>>, Vec<Range<usize>>) {
-    let mut result: (Option<Range<usize>>, Vec<Range<usize>>) = (None, Vec::new());
+    let intersection_start = range1.start.max(range2.start);
+    let intersection_end = range1.end.min(range2.end);
 
-    let start = range1.start.max(range2.start);
-    let end = range1.end.min(range2.end);
+    let intersection = if intersection_start < intersection_end {
+        Some(intersection_start..intersection_end)
+    } else {
+        None
+    };
 
-    if start < end {
-        result.0 = Some(start..end);
+    let mut ranges_left_of_intersection = vec![];
+    if intersection_start == range2.start {
+        ranges_left_of_intersection.push(range1.start..range2.start.min(range1.end));
     }
-    if range1.start < start {
-        result.1.push(range1.start..start);
-    }
+    if intersection_end == range2.end {
+        ranges_left_of_intersection.push(range2.end.max(range1.start)..range1.end);
+    };
 
-    if end < range1.end {
-        result.1.push(end..range1.end);
-    }
-
-    result
+    (intersection, ranges_left_of_intersection)
 }
 
 pub fn get_maps(input: &str) -> Input {
@@ -211,5 +203,45 @@ fn update_vec(lines: &mut Lines, corresponding_vec: &mut Vec<MapD>) {
             source_range_start,
             range_length,
         });
+    }
+}
+
+fn main() {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Test the scenario where there is no intersection between two ranges.
+    #[test]
+    fn test_no_intersection() {
+        let r1 = 0..2;
+        let r2 = 3..5;
+        let (a, b) = get_range_intersection_left_all(&r1, &r2);
+
+        assert_eq!(a, None, "Expected no intersection, but found one");
+        assert_eq!(b, vec![0..2], "Unexpected range in result");
+    }
+
+    /// Test the scenario where there is an intersection between two ranges.
+    #[test]
+    fn test_intersection() {
+        let r1 = 0..8;
+        let r2 = 3..5;
+        let (a, b) = get_range_intersection_left_all(&r1, &r2);
+
+        assert_eq!(a, Some(3..5), "Unexpected intersection range");
+        assert_eq!(b, vec![0..3, 5..8], "Unexpected ranges in result");
+    }
+
+    /// Test the scenario where one range is entirely within the other.
+    #[test]
+    fn test_one_range_within_another() {
+        let r1 = 3..5;
+        let r2 = 0..8;
+        let (a, b) = get_range_intersection_left_all(&r1, &r2);
+
+        assert_eq!(a, Some(3..5), "Unexpected intersection range");
+        assert_eq!(b, vec![], "Unexpected ranges in result");
     }
 }
