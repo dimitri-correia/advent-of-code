@@ -11,7 +11,7 @@ mod tests {
         let input = include_str!("input1.txt"); //same
         let output = part_2(input);
         dbg!(&output);
-        assert_eq!("", r);
+        assert_eq!("", output);
     }
     #[test]
     fn example_test() {
