@@ -7,38 +7,64 @@ fn main() {
     dbg!(output);
 }
 
-fn part_2(input: &str) -> String {
-    let (pattern, map, mut starting_points): (Chars, HashMap<String, MapLine>, Vec<String>) =
+pub fn part_2(input: &str) -> String {
+    let (pattern, map, starting_points): (Chars, HashMap<String, MapLine>, Vec<String>) =
         read_input(input);
 
-    let mut pattern = pattern
-        .map(|c| match c {
-            'L' => Direction::Left,
-            _ => Direction::Right,
+    let results = starting_points
+        .iter()
+        .map(|node| {
+            let mut current_node = node.clone();
+            pattern
+                .clone()
+                .map(|c| match c {
+                    'L' => Direction::Left,
+                    _ => Direction::Right,
+                })
+                .cycle()
+                .enumerate()
+                .find_map(|(index, instruction)| {
+                    let next_node = map.get(&current_node).unwrap();
+                    if next_node.end {
+                        return Some(index);
+                    }
+                    current_node = match instruction {
+                        Direction::Left => next_node.left.clone(),
+                        Direction::Right => next_node.right.clone(),
+                    };
+                    None
+                })
+                .unwrap()
         })
-        .cycle();
+        .collect::<Vec<usize>>();
 
-    let mut i = 0;
-    while !starting_points.iter().all(|p| map.get(p).unwrap().end) {
-        match pattern.next().unwrap() {
-            Direction::Left => {
-                starting_points = starting_points
-                    .iter()
-                    .flat_map(|p| map.get(p).map(|line| line.left.clone()))
-                    .collect();
+    dbg!(&results);
+
+    let min_cycle = calculate_least_common_multiple(&results);
+
+    min_cycle.to_string()
+}
+
+pub fn calculate_least_common_multiple(nums: &[usize]) -> usize {
+    match nums.len() {
+        0 => 1,
+        1 => nums[0],
+        _ => {
+            let mut result = nums[0];
+            for &num in &nums[1..] {
+                result = result * num / calculate_greatest_common_divisor(result, num);
             }
-            _ => {
-                starting_points = starting_points
-                    .iter()
-                    .flat_map(|p| map.get(p).map(|line| line.right.clone()))
-                    .collect();
-            }
+            result
         }
-
-        i += 1;
     }
+}
 
-    i.to_string()
+fn calculate_greatest_common_divisor(a: usize, b: usize) -> usize {
+    if b == 0 {
+        a
+    } else {
+        calculate_greatest_common_divisor(b, a % b)
+    }
 }
 
 #[derive(Debug)]
