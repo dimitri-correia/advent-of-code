@@ -1,9 +1,3 @@
-fn main() {
-    let input = include_str!("input1.txt");
-    let output = part_1(input);
-    dbg!(output);
-}
-
 fn part_1(input: &str) -> String {
     let mut res = 0;
 
@@ -36,7 +30,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_1(input);
+        dbg!(&output);
+        assert_eq!("53386", r);
+    }
+
+    #[test]
+    fn example_test() {
         let input = include_str!("input1_ex.txt");
         let r = part_1(input);
         assert_eq!("142", r);
