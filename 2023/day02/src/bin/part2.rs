@@ -1,8 +1,8 @@
 use std::cmp::max;
 use std::collections::HashMap;
 
-use common::extract_game_info;
 use common::Colors;
+use common::extract_game_info;
 
 mod common;
 
