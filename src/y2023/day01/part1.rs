@@ -1,28 +1,26 @@
 fn part_1(input: &str) -> String {
-    let mut res = 0;
-
     input
-        .split("\n")
-        .filter(|line| !line.is_empty())
-        .for_each(|line| {
-            dbg!(line);
-            res += line
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            let first_digit = line
                 .chars()
                 .find(|c| c.is_ascii_digit())
-                .expect("here")
+                .unwrap()
                 .to_digit(10)
-                .expect("here 1")
-                * 10
-                + line
-                    .chars()
-                    .rev()
-                    .find(|c| c.is_ascii_digit())
-                    .expect("here 2")
-                    .to_digit(10)
-                    .expect("here 3");
-        });
+                .unwrap();
+            let last_digit = line
+                .chars()
+                .rev()
+                .find(|c| c.is_ascii_digit())
+                .unwrap()
+                .to_digit(10)
+                .unwrap();
 
-    res.to_string()
+            10 * first_digit + last_digit
+        })
+        .sum::<u32>()
+        .to_string()
 }
 
 #[cfg(test)]
