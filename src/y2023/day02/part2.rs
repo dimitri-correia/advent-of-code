@@ -4,29 +4,30 @@ use std::collections::HashMap;
 use crate::y2023::day02::common::{extract_game_info, Colors};
 
 fn part_2(input: &str) -> String {
-    let mut res: u32 = 0;
-    for line in input.lines() {
-        let mut bag_min = create_bag_min();
-        let game_info = extract_game_info(line);
-        for subset in game_info.subsets {
-            dbg!(&subset);
-            for (quantity, color) in subset {
-                let current = bag_min.get(&color).unwrap();
-                *bag_min.entry(color).or_insert(0) = max(*current, quantity);
-            }
-        }
-        res += bag_min.values().product::<u32>();
-        dbg!(&bag_min, &res);
-    }
-    res.to_string()
+    input
+        .lines()
+        .map(|line| {
+            extract_game_info(line)
+                .subsets
+                .iter()
+                .fold(create_bag_min(), |mut acc, subset| {
+                    subset.iter().for_each(|&(quantity, ref color)| {
+                        let current = acc.entry(color.clone()).or_default();
+                        *current = max(*current, quantity);
+                    });
+                    acc
+                })
+                .values()
+                .product::<u32>()
+        })
+        .sum::<u32>()
+        .to_string()
 }
 
 fn create_bag_min() -> HashMap<Colors, u32> {
-    let mut bag_possibilities = HashMap::new();
-    bag_possibilities.insert(Colors::R, 0);
-    bag_possibilities.insert(Colors::G, 0);
-    bag_possibilities.insert(Colors::B, 0);
-    bag_possibilities
+    vec![(Colors::R, 0), (Colors::G, 0), (Colors::B, 0)]
+        .into_iter()
+        .collect()
 }
 
 #[cfg(test)]
