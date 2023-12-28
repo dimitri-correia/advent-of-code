@@ -1,64 +1,52 @@
 fn part_2(input: &str) -> String {
-    let mut res = 0;
-
     input
-        .split("\n")
-        .filter(|line| !line.is_empty())
-        .for_each(|line| {
-            dbg!(line);
-            for i in 0..line.len() {
-                let r = match &line[i..] {
-                    s if s.starts_with("one") => Some(1),
-                    s if s.starts_with("two") => Some(2),
-                    s if s.starts_with("three") => Some(3),
-                    s if s.starts_with("four") => Some(4),
-                    s if s.starts_with("five") => Some(5),
-                    s if s.starts_with("six") => Some(6),
-                    s if s.starts_with("seven") => Some(7),
-                    s if s.starts_with("eight") => Some(8),
-                    s if s.starts_with("nine") => Some(9),
-                    _ => None,
-                };
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            let first_digit = get_first_digit(line);
+            let last_digit = get_last_digit(line);
 
-                if let Some(value) = r {
-                    res += value * 10;
-                    break;
-                }
+            10 * first_digit + last_digit
+        })
+        .sum::<u32>()
+        .to_string()
+}
 
-                if line.chars().nth(i).unwrap().is_ascii_digit() {
-                    res += 10 * line.chars().nth(i).unwrap().to_digit(10).unwrap();
-                    break;
-                }
-            }
+fn get_first_digit(s: &str) -> u32 {
+    s.chars()
+        .enumerate()
+        .find_map(|(idx, c)| {
+            let rest_of_line: String = s[idx..].to_string();
+            get_digit(c, rest_of_line)
+        })
+        .unwrap()
+}
 
-            for i in (0..line.len()).rev() {
-                let reduced_line = &line[i..];
-                let r = match reduced_line {
-                    s if s.starts_with("one") => Some(1),
-                    s if s.starts_with("two") => Some(2),
-                    s if s.starts_with("three") => Some(3),
-                    s if s.starts_with("four") => Some(4),
-                    s if s.starts_with("five") => Some(5),
-                    s if s.starts_with("six") => Some(6),
-                    s if s.starts_with("seven") => Some(7),
-                    s if s.starts_with("eight") => Some(8),
-                    s if s.starts_with("nine") => Some(9),
-                    _ => None,
-                };
+fn get_last_digit(s: &str) -> u32 {
+    s.chars()
+        .rev()
+        .enumerate()
+        .find_map(|(idx, c)| {
+            let rest_of_line: String = s[s.len() - idx..].to_string();
+            get_digit(c, rest_of_line)
+        })
+        .unwrap()
+}
 
-                if let Some(value) = r {
-                    res += value;
-                    break;
-                }
-
-                if line.chars().nth(i).unwrap().is_ascii_digit() {
-                    res += line.chars().nth(i).unwrap().to_digit(10).unwrap();
-                    break;
-                }
-            }
-        });
-
-    res.to_string()
+fn get_digit(c: char, rest_of_line: String) -> Option<u32> {
+    match rest_of_line {
+        s if s.starts_with("one") => Some(1),
+        s if s.starts_with("two") => Some(2),
+        s if s.starts_with("three") => Some(3),
+        s if s.starts_with("four") => Some(4),
+        s if s.starts_with("five") => Some(5),
+        s if s.starts_with("six") => Some(6),
+        s if s.starts_with("seven") => Some(7),
+        s if s.starts_with("eight") => Some(8),
+        s if s.starts_with("nine") => Some(9),
+        _ if c.is_ascii_digit() => Some(c.to_digit(10).unwrap()),
+        _ => None,
+    }
 }
 
 #[cfg(test)]
