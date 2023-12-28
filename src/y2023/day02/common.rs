@@ -5,10 +5,15 @@ pub enum Colors {
     B,
 }
 
-pub fn extract_game_info(line: &str) -> (u32, Vec<Vec<(u32, Colors)>>) {
+pub struct GameInfo {
+    pub game_id: u32,
+    pub subsets: Vec<Vec<(u32, Colors)>>,
+}
+
+pub fn extract_game_info(line: &str) -> GameInfo {
     let mut parts = line.split(':');
-    let game_id_str = parts.next().expect("Invalid input: missing game ID");
-    let game_info = parts.next().expect("Invalid input: missing game info");
+    let game_id_str = parts.next().unwrap();
+    let game_info = parts.next().unwrap();
 
     let game_id = game_id_str
         .chars()
@@ -18,8 +23,8 @@ pub fn extract_game_info(line: &str) -> (u32, Vec<Vec<(u32, Colors)>>) {
         .chars()
         .rev()
         .collect::<String>()
-        .parse()
-        .unwrap_or_else(|_| panic!("Failed to parse game ID: {}", game_id_str));
+        .parse::<u32>()
+        .unwrap();
 
     let subsets: Vec<Vec<(u32, Colors)>> = game_info
         .split(';')
@@ -27,12 +32,8 @@ pub fn extract_game_info(line: &str) -> (u32, Vec<Vec<(u32, Colors)>>) {
             s.split(',')
                 .map(|pair| {
                     let mut parts = pair.split_whitespace();
-                    let number: u32 = parts
-                        .next()
-                        .expect("Missing number")
-                        .parse()
-                        .expect("Failed to parse number");
-                    let color = match parts.next().expect("Missing color") {
+                    let number: u32 = parts.next().unwrap().parse::<u32>().unwrap();
+                    let color = match parts.next().unwrap() {
                         "red" => Colors::R,
                         "green" => Colors::G,
                         "blue" => Colors::B,
@@ -44,5 +45,5 @@ pub fn extract_game_info(line: &str) -> (u32, Vec<Vec<(u32, Colors)>>) {
         })
         .collect();
 
-    (game_id, subsets)
+    GameInfo { game_id, subsets }
 }
