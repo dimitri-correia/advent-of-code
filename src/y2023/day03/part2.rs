@@ -1,12 +1,6 @@
 use std::cmp::min;
 use std::collections::HashSet;
 
-fn main() {
-    let input = include_str!("input1.txt"); // same
-    let output = part_2(input);
-    dbg!(output);
-}
-
 fn part_2(input: &str) -> String {
     let lines: Vec<&str> = input.lines().collect();
     dbg!(&lines);
@@ -97,8 +91,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let input = include_str!("input1_ex.txt"); // same
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_2(input);
+        dbg!(&output);
+        assert_eq!("82301120", output);
+    }
+
+    #[test]
+    fn example_test() {
+        let input = include_str!("input1_ex.txt"); // same file
         let r = part_2(input);
         assert_eq!("467835", r);
     }

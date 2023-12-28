@@ -1,18 +1,11 @@
 use std::cmp::min;
 
-fn main() {
-    let input = include_str!("input1.txt");
-    let output = part_1(input);
-    dbg!(output);
-}
-
 fn part_1(input: &str) -> String {
     let lines: Vec<&str> = input.lines().collect();
-    dbg!(&lines);
 
     let mut res = 0;
 
-    for (line_number, line) in lines.iter().enumerate() {
+    input.lines().enumerate().for_each(|(idx, line)| {
         let mut char_index = 0;
 
         while char_index < line.len() {
@@ -23,17 +16,16 @@ fn part_1(input: &str) -> String {
             }
             // c is a digit
             let end = get_whole_number(line, char_index);
-            if symbol_adjacent(&lines, line_number, char_index, end) {
-                let number = line[char_index..end].parse::<i32>().unwrap();
+            if symbol_adjacent(&lines, idx, char_index, end) {
+                let number = line[char_index..end].parse::<usize>().unwrap();
                 dbg!(number);
                 res += number;
             }
 
             char_index = end;
         }
-    }
+    });
 
-    dbg!(res);
     res.to_string()
 }
 
@@ -91,9 +83,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_1(input);
+        dbg!(&output);
+        assert_eq!("532331", output);
+    }
+
+    #[test]
+    fn example_test() {
         let input = include_str!("input1_ex.txt");
+
         let r = part_1(input);
+
         assert_eq!("4361", r);
     }
 }
