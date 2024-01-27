@@ -16,6 +16,7 @@ enum Card {
     A,
     K,
     Q,
+    J,
     T,
     _9,
     _8,
@@ -25,7 +26,6 @@ enum Card {
     _4,
     _3,
     _2,
-    J,
 }
 
 impl Card {
@@ -35,6 +35,7 @@ impl Card {
             A => 14,
             K => 13,
             Q => 12,
+            J => 11,
             T => 10,
             _9 => 9,
             _8 => 8,
@@ -44,7 +45,6 @@ impl Card {
             _4 => 4,
             _3 => 3,
             _2 => 2,
-            J => 1,
         }
     }
 }
@@ -130,6 +130,10 @@ impl Ord for PokerHand {
     }
 }
 
+fn part_1(input: &str) -> String {
+    get_total_winnings(input).to_string()
+}
+
 fn get_total_winnings(input: &str) -> usize {
     let mut hands: Vec<(PokerHand, usize)> = vec![];
 
@@ -148,6 +152,8 @@ fn get_total_winnings(input: &str) -> usize {
 
     for (idx, (_, bid)) in hands.iter().enumerate() {
         let idx = idx + 1;
+        dbg!(bid);
+        dbg!(idx);
         res += idx * bid;
     }
 
@@ -155,25 +161,33 @@ fn get_total_winnings(input: &str) -> usize {
 }
 
 fn get_kind_hand(hand_string: String) -> PokerHand {
-    let ordered_char_count = get_ordered_char_count(&hand_string);
+    let mut char_count = HashMap::new();
+
+    for c in hand_string.chars() {
+        let counter = char_count.entry(c).or_insert(0);
+        *counter += 1;
+    }
+
+    let mut ordered_char_count: Vec<_> = char_count.iter().collect();
+    ordered_char_count.sort_by_key(|&(_, count)| -count);
 
     let cards: Vec<Card> = hand_string.chars().map(Card::from).collect();
 
-    if ordered_char_count[0].1 == 5 {
+    if ordered_char_count[0].1 == &5 {
         return PokerHand::FiveOfAKind(cards);
     }
-    if ordered_char_count[0].1 == 4 {
+    if ordered_char_count[0].1 == &4 {
         return PokerHand::FourOfAKind(cards);
     }
-    if ordered_char_count[0].1 == 3 {
-        return if ordered_char_count[1].1 == 2 {
+    if ordered_char_count[0].1 == &3 {
+        return if ordered_char_count[1].1 == &2 {
             PokerHand::FullHouse(cards)
         } else {
             PokerHand::ThreeOfAKind(cards)
         };
     }
-    if ordered_char_count[0].1 == 2 {
-        return if ordered_char_count[1].1 == 2 {
+    if ordered_char_count[0].1 == &2 {
+        return if ordered_char_count[1].1 == &2 {
             PokerHand::TwoPair(cards)
         } else {
             PokerHand::OnePair(cards)
@@ -183,55 +197,22 @@ fn get_kind_hand(hand_string: String) -> PokerHand {
     PokerHand::HighCard(cards)
 }
 
-fn get_ordered_char_count(hand_string: &String) -> Vec<(char, i32)> {
-    let mut char_count: HashMap<char, i32> = HashMap::new();
-
-    for c in hand_string.chars() {
-        let counter = char_count.entry(c).or_insert(0);
-        *counter += 1;
-    }
-
-    let mut ordered_char_count: Vec<(char, i32)> = char_count.into_iter().collect();
-    ordered_char_count.sort_by_key(|&(_, count)| -count);
-
-    if let Some(&('J', v)) = ordered_char_count.iter().find(|(c, _)| c == &'J') {
-        // dbg!(v, &ordered_char_count);
-        for i in ordered_char_count.iter_mut() {
-            if i.0 != 'J' {
-                i.1 += v;
-                for i in ordered_char_count.iter_mut() {
-                    if i.0 == 'J' {
-                        i.1 = 0
-                    }
-                }
-                break;
-            }
-        }
-    }
-
-    ordered_char_count.sort_by_key(|&(_, count)| -count);
-
-    ordered_char_count
-}
-
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input);
-    dbg!(output);
-}
-
-fn part_2(input: &str) -> String {
-    get_total_winnings(input).to_string()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let input = include_str!("input1_ex.txt"); // same
-        let r = part_2(input);
-        assert_eq!("5905", r);
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_1(input);
+        dbg!(&output);
+        assert_eq!("250254244", output);
+    }
+
+    #[test]
+    fn example_test() {
+        let input = include_str!("input1_ex.txt"); // same file
+        let r = part_1(input);
+        assert_eq!("6440", r);
     }
 }
