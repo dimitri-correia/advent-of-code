@@ -12,7 +12,6 @@ fn part_2(input: &str) -> String {
                 continue;
             }
             let gear_ratio = gear_ratio(&lines, line_number, char_index);
-            dbg!(gear_ratio);
             res += gear_ratio;
         }
     }
