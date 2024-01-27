@@ -3,7 +3,6 @@ use std::collections::HashSet;
 
 fn part_2(input: &str) -> String {
     let lines: Vec<&str> = input.lines().collect();
-    dbg!(&lines);
 
     let mut res = 0;
 
@@ -18,7 +17,6 @@ fn part_2(input: &str) -> String {
         }
     }
 
-    dbg!(res);
     res.to_string()
 }
 
@@ -53,9 +51,6 @@ fn gear_ratio(lines: &Vec<&str>, line_number: usize, idx: usize) -> i32 {
         return gear_values
             .iter()
             .map(|(row, (start, end))| lines[*row][*start..*end].parse::<i32>().unwrap())
-            .inspect(|&n| {
-                dbg!(n);
-            })
             .product::<i32>();
     }
     0
