@@ -1,3 +1,5 @@
+use crate::y2023::day06::common::calculate_local_res;
+
 fn part_1(input: &str) -> String {
     let (times, distances_to_beat): (Vec<usize>, Vec<usize>) = read_input(input);
     let res = compute_number_of_ways_to_win(times, distances_to_beat);
@@ -7,19 +9,19 @@ fn part_1(input: &str) -> String {
 fn read_input(input: &str) -> (Vec<usize>, Vec<usize>) {
     let mut lines = input.lines().map(str::trim);
 
-    let parse_line = |line: &str| -> Vec<usize> {
-        line.split(':')
-            .last()
-            .unwrap()
-            .split_whitespace()
-            .map(|i| i.parse::<usize>().unwrap())
-            .collect()
-    };
-
     let times = parse_line(lines.next().unwrap());
     let distances_to_beat = parse_line(lines.next().unwrap());
 
     (times, distances_to_beat)
+}
+
+fn parse_line(line: &str) -> Vec<usize> {
+    line.split(':')
+        .last()
+        .unwrap()
+        .split_whitespace()
+        .map(|i| i.parse::<usize>().unwrap())
+        .collect()
 }
 
 fn compute_number_of_ways_to_win(times: Vec<usize>, distances_to_beat: Vec<usize>) -> i32 {
@@ -28,17 +30,6 @@ fn compute_number_of_ways_to_win(times: Vec<usize>, distances_to_beat: Vec<usize
         .zip(distances_to_beat.iter())
         .map(|(&total_time, &distance_to_beat)| calculate_local_res(total_time, distance_to_beat))
         .product()
-}
-
-fn calculate_local_res(total_time: usize, distance_to_beat: usize) -> i32 {
-    (0..=total_time)
-        .filter(|&charging_time| {
-            let speed = charging_time;
-            let time_of_travel = total_time - charging_time;
-            let dist = speed * time_of_travel;
-            dist > distance_to_beat
-        })
-        .count() as i32
 }
 
 #[cfg(test)]
