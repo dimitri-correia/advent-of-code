@@ -18,7 +18,6 @@ fn part_1(input: &str) -> String {
             let end = get_whole_number(line, char_index);
             if symbol_adjacent(&lines, idx, char_index, end) {
                 let number = line[char_index..end].parse::<usize>().unwrap();
-                dbg!(number);
                 res += number;
             }
 
