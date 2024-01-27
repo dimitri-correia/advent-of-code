@@ -1,12 +1,4 @@
-use common::{get_maps, get_min_location_p_2};
-
-mod common;
-
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input);
-    dbg!(output);
-}
+use crate::y2023::day05::common::{get_maps, get_min_location_p_2};
 
 fn part_2(input: &str) -> String {
     let input = get_maps(input);
@@ -20,8 +12,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let input = include_str!("input1_ex.txt"); // same
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_2(input);
+        dbg!(&output);
+        assert_eq!("60568880", output);
+    }
+
+    #[test]
+    fn example_test() {
+        let input = include_str!("input1_ex.txt"); // same file
         let r = part_2(input);
         assert_eq!("46", r);
     }

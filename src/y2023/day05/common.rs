@@ -2,11 +2,6 @@ use std::cmp::min;
 use std::ops::Range;
 use std::str::Lines;
 
-pub enum Part {
-    Part1,
-    Part2,
-}
-
 #[derive(Debug)]
 pub struct MapD {
     destination_range_start: usize,
@@ -30,7 +25,6 @@ pub fn get_min_location_p_1(input: Input) -> usize {
     let mut res = usize::MAX;
 
     for mut seed in input.seeds {
-        //dbg!(&seed);
         for map in [
             &input.seed_to_soil,
             &input.soil_to_fertilizer,
@@ -50,7 +44,6 @@ pub fn get_min_location_p_1(input: Input) -> usize {
                 _ => seed,
             };
         }
-        //dbg!(seed);
         res = min(res, seed);
     }
     res
@@ -58,8 +51,6 @@ pub fn get_min_location_p_1(input: Input) -> usize {
 
 pub fn get_min_location_p_2(input: Input) -> usize {
     let mut vec_number = init_vec(&input);
-
-    dbg!(&vec_number);
 
     for map in [
         &input.seed_to_soil,
@@ -72,7 +63,6 @@ pub fn get_min_location_p_2(input: Input) -> usize {
     ]
     .iter()
     {
-        dbg!(&map);
         let mut new_vec_number = Vec::new();
         'rng: while let Some(range) = vec_number.pop() {
             for m in map.iter() {
@@ -92,7 +82,6 @@ pub fn get_min_location_p_2(input: Input) -> usize {
             new_vec_number.push(range);
         }
         vec_number = new_vec_number;
-        dbg!(&vec_number);
     }
 
     vec_number
@@ -205,8 +194,6 @@ fn update_vec(lines: &mut Lines, corresponding_vec: &mut Vec<MapD>) {
         });
     }
 }
-
-fn main() {}
 
 #[cfg(test)]
 mod tests {
