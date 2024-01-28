@@ -1,6 +1,5 @@
 use crate::y2023::day10::common::Pipe::{SouthEast, SouthWest, StartingPosition, Vertical};
 use crate::y2023::day10::common::{get_path, Pipe};
-use std::sync::Mutex;
 
 fn part_2(input: &str) -> String {
     let (pass, lines_vec) = get_path(input);
@@ -15,36 +14,37 @@ enum Status {
 }
 
 fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usize {
-    let change_in_out = [StartingPosition, Vertical, SouthWest, SouthEast];
-
     line_vec
         .iter()
         .enumerate()
-        .map(|(x, line)| {
-            let status = Mutex::new(Status::Out);
-            line.iter()
-                .enumerate()
-                .filter(|(y, pipe)| {
-                    let mut status = status.lock().unwrap(); // Acquire the lock
-
-                    if !pass.contains(&(x, *y)) {
-                        match *status {
-                            Status::In => true,
-                            Status::Out => false,
-                        }
-                    } else {
-                        if change_in_out.contains(pipe) {
-                            *status = match *status {
-                                Status::In => Status::Out,
-                                Status::Out => Status::In,
-                            };
-                        }
-                        false
-                    }
-                })
-                .count()
-        })
+        .map(|(x, line)| count_line(pass, &x, line))
         .sum()
+}
+
+fn count_line(pass: &[(usize, usize)], x: &usize, line: &Vec<Pipe>) -> usize {
+    let change_in_out = [StartingPosition, Vertical, SouthWest, SouthEast];
+    let mut status = Status::Out;
+
+    let mut res = 0;
+
+    for (y, pipe) in line.iter().enumerate() {
+        if !pass.contains(&(*x, y)) {
+            res += match status {
+                Status::In => 1,
+                Status::Out => 0,
+            }
+        } else {
+            // in pass
+            if change_in_out.contains(pipe) {
+                status = match status {
+                    Status::In => Status::Out,
+                    Status::Out => Status::In,
+                };
+            }
+        }
+    }
+
+    res
 }
 
 #[cfg(test)]
