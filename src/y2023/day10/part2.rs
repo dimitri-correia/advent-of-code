@@ -15,15 +15,16 @@ enum Status {
 
 fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usize {
     let change_in_out = [StartingPosition, Vertical, SouthWest, SouthEast];
+
     line_vec
         .iter()
         .enumerate()
-        .map(|(x, l)| {
+        .map(|(x, line)| {
             let mut status = Status::Out;
-            l.iter()
+            line.iter()
                 .enumerate()
                 .filter(|(y, pipe)| {
-                    if !(pass.contains(&(x, *y))) {
+                    if !pass.contains(&(x, *y)) {
                         match status {
                             Status::In => true,
                             Status::Out => false,
@@ -34,13 +35,13 @@ fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usiz
                                 Status::In => Status::Out,
                                 Status::Out => Status::In,
                             };
-                        };
+                        }
                         false
                     }
                 })
                 .count()
         })
-        .sum::<usize>()
+        .sum()
 }
 
 #[cfg(test)]
