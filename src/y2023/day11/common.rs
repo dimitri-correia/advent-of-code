@@ -6,7 +6,6 @@ pub fn calculate_distances(input: &str, expansion: usize) -> Vec<usize> {
         .enumerate()
         .flat_map(|(i, &(x, y))| {
             points.iter().skip(i + 1).map(move |&(xx, yy)| {
-                dbg!(((x, y), (xx, yy)));
                 ((xx as isize - x as isize).abs() + (yy as isize - y as isize).abs()) as usize
             })
         })
