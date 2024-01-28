@@ -1,16 +1,12 @@
-use crate::y2023::day10::common::Pipe::{SouthEast, SouthWest, StartingPosition, Vertical};
+use crate::y2023::day10::common::Pipe::{
+    NorthEast, NorthWest, SouthEast, SouthWest, StartingPosition, Vertical,
+};
 use crate::y2023::day10::common::{get_path, Pipe};
 
 fn part_2(input: &str) -> String {
     let (pass, lines_vec) = get_path(input);
 
     count_point_inside(&pass, lines_vec).to_string()
-}
-
-#[derive(Debug, Eq, PartialEq)]
-enum Status {
-    In,
-    Out,
 }
 
 fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usize {
@@ -22,29 +18,30 @@ fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usiz
 }
 
 fn count_line(pass: &[(usize, usize)], x: &usize, line: &Vec<Pipe>) -> usize {
-    let change_in_out = [StartingPosition, Vertical, SouthWest, SouthEast];
-    let mut status = Status::Out;
+    let mut inside_loop = false;
 
     let mut res = 0;
 
     for (y, pipe) in line.iter().enumerate() {
-        if !pass.contains(&(*x, y)) {
-            res += match status {
-                Status::In => 1,
-                Status::Out => 0,
+        if pass.contains(&(*x, y)) {
+            if change_in_out(pipe, line, y) {
+                inside_loop = !inside_loop;
             }
-        } else {
-            // in pass
-            if change_in_out.contains(pipe) {
-                status = match status {
-                    Status::In => Status::Out,
-                    Status::Out => Status::In,
-                };
-            }
+        } else if inside_loop {
+            res += 1;
         }
     }
 
     res
+}
+
+fn change_in_out(pipe: &Pipe, line: &Vec<Pipe>, y: usize) -> bool {
+    let change_in_out = [Vertical, NorthEast, NorthWest];
+    let change_in_out_if_start = [Vertical, SouthWest, SouthEast];
+
+    change_in_out.contains(pipe)
+        || (pipe == &StartingPosition
+            && (y != 0 && change_in_out_if_start.contains(line.get(y - 1).unwrap())))
 }
 
 #[cfg(test)]
