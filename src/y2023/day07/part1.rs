@@ -146,14 +146,10 @@ fn get_total_winnings(input: &str) -> usize {
 
     hands.sort_by(|a, b| a.0.cmp(&b.0));
 
-    dbg!(&hands);
-
     let mut res = 0;
 
     for (idx, (_, bid)) in hands.iter().enumerate() {
         let idx = idx + 1;
-        dbg!(bid);
-        dbg!(idx);
         res += idx * bid;
     }
 

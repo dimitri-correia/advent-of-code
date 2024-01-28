@@ -142,8 +142,6 @@ fn get_total_winnings(input: &str) -> usize {
 
     hands.sort_by(|a, b| a.0.cmp(&b.0));
 
-    dbg!(&hands);
-
     let mut res = 0;
 
     for (idx, (_, bid)) in hands.iter().enumerate() {
@@ -212,12 +210,6 @@ fn get_ordered_char_count(hand_string: &String) -> Vec<(char, i32)> {
     ordered_char_count.sort_by_key(|&(_, count)| -count);
 
     ordered_char_count
-}
-
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input);
-    dbg!(output);
 }
 
 fn part_2(input: &str) -> String {
