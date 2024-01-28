@@ -1,62 +1,12 @@
-use crate::Pipe::{SouthEast, SouthWest, StartingPosition, Vertical};
-
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input);
-    dbg!(output);
-}
-
-fn part_2(input: &str) -> String {
+fn part_1(input: &str) -> String {
     let (lines_vec, start_pos) = read_input(input);
 
-    let pass = get_path(&lines_vec, start_pos);
-
-    count_point_inside(&pass, lines_vec).to_string()
-}
-
-#[derive(Debug, Eq, PartialEq)]
-enum Status {
-    In,
-    Out,
-}
-
-fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usize {
-    let change_in_out = [StartingPosition, Vertical, SouthWest, SouthEast];
-    line_vec
-        .iter()
-        .enumerate()
-        .map(|(x, l)| {
-            let mut status = Status::Out;
-            l.iter()
-                .enumerate()
-                .filter(|(y, pipe)| {
-                    if !(pass.contains(&(x, *y))) {
-                        match status {
-                            Status::In => true,
-                            Status::Out => false,
-                        }
-                    } else {
-                        if change_in_out.contains(pipe) {
-                            status = match status {
-                                Status::In => Status::Out,
-                                Status::Out => Status::In,
-                            };
-                        };
-                        false
-                    }
-                })
-                .count()
-        })
-        .sum::<usize>()
-}
-
-fn get_path(lines_vec: &[Vec<Pipe>], start_pos: (usize, usize)) -> Vec<(usize, usize)> {
     let mut pass = vec![start_pos];
-    let mut pos = first_pipe(&start_pos, lines_vec);
+    let mut pos = first_pipe(&start_pos, &lines_vec);
 
     loop {
         pass.push(pos);
-        let opt_pos = get_next(&pos, &pass, lines_vec);
+        let opt_pos = get_next(&pos, &pass, &lines_vec);
 
         if opt_pos.is_none() {
             break;
@@ -64,7 +14,9 @@ fn get_path(lines_vec: &[Vec<Pipe>], start_pos: (usize, usize)) -> Vec<(usize, u
 
         pos = opt_pos.unwrap();
     }
-    pass
+    dbg!(&pass);
+
+    (pass.len() / 2).to_string()
 }
 
 fn read_input(input: &str) -> (Vec<Vec<Pipe>>, (usize, usize)) {
@@ -82,6 +34,7 @@ fn read_input(input: &str) -> (Vec<Vec<Pipe>>, (usize, usize)) {
         lines_vec.push(line_vec);
     }
 
+    dbg!(start_pos);
     (lines_vec, start_pos)
 }
 
@@ -149,6 +102,7 @@ fn first_pipe(pos: &(usize, usize), lines_vec: &[Vec<Pipe>]) -> (usize, usize) {
             adjacent_pipes.push(((x, y), pipe));
         }
     }
+    dbg!(&adjacent_pipes);
     if adjacent_pipes.len() != 2 {
         panic!("more than 2 adjacent pipe at the start");
     }
@@ -192,23 +146,38 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works1() {
-        let input = include_str!("input2_ex1.txt");
-        let r = part_2(input);
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_1(input);
+        dbg!(&output);
+        assert_eq!("1696140818", output);
+    }
+
+    #[test]
+    fn example_test_a() {
+        let input = include_str!("input1_ex.txt");
+        let r = part_1(input);
         assert_eq!("4", r);
     }
 
     #[test]
-    fn it_works2() {
-        let input = include_str!("input2_ex2.txt");
-        let r = part_2(input);
+    fn example_test_b() {
+        let input = include_str!("input1_ex2.txt");
+        let r = part_1(input);
+        assert_eq!("4", r);
+    }
+
+    #[test]
+    fn example_test_c() {
+        let input = include_str!("input1_ex3.txt");
+        let r = part_1(input);
         assert_eq!("8", r);
     }
 
     #[test]
-    fn it_works3() {
-        let input = include_str!("input2_ex3.txt");
-        let r = part_2(input);
-        assert_eq!("10", r);
+    fn example_test_d() {
+        let input = include_str!("input1_ex4.txt");
+        let r = part_1(input);
+        assert_eq!("8", r);
     }
 }
