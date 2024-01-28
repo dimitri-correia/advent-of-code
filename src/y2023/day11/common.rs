@@ -14,18 +14,19 @@ pub struct Pos {
 pub fn calculate_distances(input: &str, expansion: usize) -> Vec<Dist> {
     let points = get_points(input, expansion);
 
-    let mut distances = vec![];
-    for (i, &(x, y)) in points.iter().enumerate() {
-        for &(xx, yy) in points.iter().skip(i + 1) {
-            let dist =
-                ((xx as isize - x as isize).abs() + (yy as isize - y as isize).abs()) as usize;
-            let from = Pos { x, y };
-            let to = Pos { x: xx, y: yy };
-            distances.push(Dist { from, to, dist })
-        }
-    }
-
-    distances
+    points
+        .iter()
+        .enumerate()
+        .flat_map(|(i, &(x, y))| {
+            points.iter().skip(i + 1).map(move |&(xx, yy)| {
+                let dist =
+                    ((xx as isize - x as isize).abs() + (yy as isize - y as isize).abs()) as usize;
+                let from = Pos { x, y };
+                let to = Pos { x: xx, y: yy };
+                Dist { from, to, dist }
+            })
+        })
+        .collect()
 }
 
 fn get_points(input: &str, expansion: usize) -> Vec<(usize, usize)> {
@@ -43,17 +44,15 @@ fn get_points(input: &str, expansion: usize) -> Vec<(usize, usize)> {
         })
         .collect();
 
-    let mut shift = vec![];
-    for i in 0..input.lines().next().unwrap().len() {
-        if input
-            .lines()
-            .all(|line| line.chars().nth(i).unwrap() == '.')
-        {
-            shift.push(i);
-        }
-    }
+    let shift: Vec<usize> = (0..input.lines().next().unwrap().len())
+        .filter(|&i| {
+            input
+                .lines()
+                .all(|line| line.chars().nth(i).unwrap() == '.')
+        })
+        .collect();
 
-    let points: Vec<(usize, usize)> = points
+    points
         .iter()
         .map(|(a, b)| {
             (
@@ -61,7 +60,5 @@ fn get_points(input: &str, expansion: usize) -> Vec<(usize, usize)> {
                 *b + expansion * shift.iter().filter(|&&i| i < *b).count(),
             )
         })
-        .collect();
-
-    points
+        .collect()
 }
