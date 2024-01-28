@@ -1,5 +1,6 @@
 use crate::y2023::day10::common::Pipe::{SouthEast, SouthWest, StartingPosition, Vertical};
 use crate::y2023::day10::common::{get_path, Pipe};
+use std::sync::Mutex;
 
 fn part_2(input: &str) -> String {
     let (pass, lines_vec) = get_path(input);
@@ -20,18 +21,20 @@ fn count_point_inside(pass: &[(usize, usize)], line_vec: Vec<Vec<Pipe>>) -> usiz
         .iter()
         .enumerate()
         .map(|(x, line)| {
-            let mut status = Status::Out;
+            let status = Mutex::new(Status::Out);
             line.iter()
                 .enumerate()
                 .filter(|(y, pipe)| {
+                    let mut status = status.lock().unwrap(); // Acquire the lock
+
                     if !pass.contains(&(x, *y)) {
-                        match status {
+                        match *status {
                             Status::In => true,
                             Status::Out => false,
                         }
                     } else {
                         if change_in_out.contains(pipe) {
-                            status = match status {
+                            *status = match *status {
                                 Status::In => Status::Out,
                                 Status::Out => Status::In,
                             };
