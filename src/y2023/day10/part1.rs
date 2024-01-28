@@ -1,21 +1,7 @@
-use crate::y2023::day10::common::{first_pipe, get_next, read_input};
+use crate::y2023::day10::common::get_path;
 
 fn part_1(input: &str) -> String {
-    let (lines_vec, start_pos) = read_input(input);
-
-    let mut pass = vec![start_pos];
-    let mut pos = first_pipe(&start_pos, &lines_vec);
-
-    loop {
-        pass.push(pos);
-        let opt_pos = get_next(&pos, &pass, &lines_vec);
-
-        if opt_pos.is_none() {
-            break;
-        }
-
-        pos = opt_pos.unwrap();
-    }
+    let (pass, _) = get_path(input);
 
     (pass.len() / 2).to_string()
 }

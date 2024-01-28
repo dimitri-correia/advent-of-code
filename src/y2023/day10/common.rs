@@ -1,3 +1,21 @@
+pub fn get_path(input: &str) -> (Vec<(usize, usize)>, Vec<Vec<Pipe>>) {
+    let (lines_vec, start_pos) = read_input(input);
+    let mut pass = vec![start_pos];
+    let mut pos = first_pipe(&start_pos, &lines_vec);
+
+    loop {
+        pass.push(pos);
+        let opt_pos = get_next(&pos, &pass, &lines_vec);
+
+        if opt_pos.is_none() {
+            break;
+        }
+
+        pos = opt_pos.unwrap();
+    }
+    (pass, lines_vec)
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Pipe {
     // |
