@@ -32,8 +32,6 @@ pub fn part_2(input: &str) -> String {
         })
         .collect::<Vec<usize>>();
 
-    dbg!(&results);
-
     let min_cycle = calculate_least_common_multiple(&results);
 
     min_cycle.to_string()
@@ -75,16 +73,18 @@ fn read_input(input: &str) -> (Chars, HashMap<String, MapLine>, Vec<String>) {
     //remove empty line
     lines.next();
 
-    let mut map = HashMap::new();
-    let mut starting_points = vec![];
+    let (map, starting_points): (HashMap<String, MapLine>, Vec<String>) =
+        lines.map(|line| parse_line(line)).fold(
+            (HashMap::new(), Vec::new()),
+            |(mut map, mut starting_points), (actual_pos, map_line, start)| {
+                map.insert(actual_pos.clone(), map_line);
+                if start {
+                    starting_points.push(actual_pos);
+                }
+                (map, starting_points)
+            },
+        );
 
-    for line in lines {
-        let (actual_pos, map_line, start) = parse_line(line);
-        map.insert(actual_pos.clone(), map_line);
-        if start {
-            starting_points.push(actual_pos);
-        }
-    }
     (pattern, map, starting_points)
 }
 
@@ -100,11 +100,15 @@ fn parse_line(input: &str) -> (String, MapLine, bool) {
         .chars()
         .filter(|&c| c.is_alphanumeric() || c == ',' || c == '=')
         .collect();
+
     let parts: Vec<&str> = cleaned_input.split('=').collect();
     let actual_pos = parts[0].trim().to_string();
+
     let parts: Vec<&str> = parts[1].split(',').collect();
+
     let left = parts[0].trim().to_string();
     let right = parts[1].trim().to_string();
+
     let start = actual_pos.ends_with('A');
     let end = actual_pos.ends_with('Z');
 
