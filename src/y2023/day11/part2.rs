@@ -1,9 +1,4 @@
-mod common;
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input, 1_000_000);
-    dbg!(output);
-}
+use crate::y2023::day11::common;
 
 fn part_2(input: &str, i: usize) -> String {
     let distances = common::calculate_distances(input, i);
@@ -18,14 +13,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works_10() {
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_2(input, 1_000_000);
+        dbg!(&output);
+        assert_eq!("1152", output);
+    }
+
+    #[test]
+    fn example_test_10() {
         let input = include_str!("input1_ex.txt"); // same
         let r = part_2(input, 10);
         assert_eq!("1030", r);
     }
 
     #[test]
-    fn it_works_100() {
+    fn example_test_100() {
         let input = include_str!("input1_ex.txt"); // same
         let r = part_2(input, 100);
         assert_eq!("8410", r);
