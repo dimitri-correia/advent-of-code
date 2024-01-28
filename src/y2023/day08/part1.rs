@@ -3,7 +3,6 @@ use std::collections::HashMap;
 fn part_1(input: &str) -> String {
     let (pattern, map): (&str, HashMap<String, MapLine>) = read_input(input);
 
-    dbg!(&map);
     let mut pos = String::from("AAA");
     let mut i = 0;
     while pos != "ZZZ" {
@@ -24,17 +23,11 @@ fn read_input(input: &str) -> (&str, HashMap<String, MapLine>) {
 
     let pattern = lines.next().unwrap();
 
-    dbg!(pattern);
-
-    //remove empty line
+    // remove empty line
     lines.next();
 
-    let mut map = HashMap::new();
+    let map: HashMap<String, MapLine> = lines.map(|line| parse_line(line)).collect();
 
-    for line in lines {
-        let (actual_pos, map_line) = parse_line(line);
-        map.insert(actual_pos, map_line);
-    }
     (pattern, map)
 }
 
@@ -49,8 +42,10 @@ fn parse_line(input: &str) -> (String, MapLine) {
         .chars()
         .filter(|&c| c.is_alphanumeric() || c == ',' || c == '=')
         .collect();
+
     let parts: Vec<&str> = cleaned_input.split('=').collect();
     let actual_pos = parts[0].trim().to_string();
+
     let parts: Vec<&str> = parts[1].split(',').collect();
     let left = parts[0].trim().to_string();
     let right = parts[1].trim().to_string();
