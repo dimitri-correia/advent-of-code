@@ -1,12 +1,6 @@
 use std::collections::HashMap;
 use std::str::Chars;
 
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input);
-    dbg!(output);
-}
-
 pub fn part_2(input: &str) -> String {
     let (pattern, map, starting_points): (Chars, HashMap<String, MapLine>, Vec<String>) =
         read_input(input);
@@ -122,7 +116,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_2(input);
+        dbg!(&output);
+        assert_eq!("11283670395017", output);
+    }
+
+    #[test]
+    fn example_test() {
         let input = include_str!("input2_ex.txt");
         let r = part_2(input);
         assert_eq!("6", r);
