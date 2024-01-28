@@ -3,7 +3,7 @@ use crate::y2023::day11::common;
 fn part_2(input: &str, i: usize) -> String {
     let distances = common::calculate_distances(input, i);
 
-    let sum: usize = distances.iter().map(|d| d.dist).sum();
+    let sum: usize = distances.iter().sum();
 
     sum.to_string()
 }
