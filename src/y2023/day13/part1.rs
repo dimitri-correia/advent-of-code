@@ -1,9 +1,3 @@
-fn main() {
-    let input = include_str!("input1.txt");
-    let output = part_1(input);
-    dbg!(output);
-}
-
 fn part_1(input: &str) -> String {
     let mut r = 0;
     for p in input.split("\n\n") {
@@ -114,8 +108,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let input = include_str!("input1_ex.txt");
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_1(input);
+        dbg!(&output);
+        assert_eq!("val", output);
+    }
+
+    #[test]
+    fn example_test() {
+        let input = include_str!("input1_ex.txt"); // same file
         let r = part_1(input);
         assert_eq!("405", r);
     }
