@@ -1,5 +1,33 @@
+use crate::y2023::day12::common::{
+    get_nb_arrangements, parse_str_to_spring_state, Line, SpringState,
+};
+
 fn part_2(input: &str) -> String {
-    "".to_string()
+    parse_input(input)
+        .iter()
+        .map(|line| get_nb_arrangements(line))
+        .sum::<usize>()
+        .to_string()
+}
+
+fn parse_input(input: &str) -> Vec<Line> {
+    input
+        .lines()
+        .map(|line| {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            let line_state: Vec<SpringState> = parts[0]
+                .chars()
+                .map(|c| parse_str_to_spring_state(c))
+                .flat_map(|num| std::iter::repeat(num).take(5))
+                .collect();
+            let order: Vec<usize> = parts[1]
+                .split(',')
+                .map(|s| s.parse::<usize>().unwrap())
+                .flat_map(|num| std::iter::repeat(num).take(5))
+                .collect();
+            Line { line_state, order }
+        })
+        .collect()
 }
 
 #[cfg(test)]
