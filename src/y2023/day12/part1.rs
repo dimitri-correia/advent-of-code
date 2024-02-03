@@ -1,5 +1,5 @@
 use crate::y2023::day12::common::{
-    get_nb_arrangements, parse_str_to_spring_state, Line, SpringState,
+    count_unknown, get_nb_arrangements, parse_str_to_spring_state, Line, SpringState,
 };
 
 fn part_1(input: &str) -> String {
@@ -23,7 +23,12 @@ fn parse_input(input: &str) -> Vec<Line> {
                 .split(',')
                 .map(|s| s.parse::<usize>().unwrap())
                 .collect();
-            Line { line_state, order }
+            let count_unknown = count_unknown(&line_state);
+            Line {
+                line_state,
+                order,
+                count_unknown,
+            }
         })
         .collect()
 }

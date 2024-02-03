@@ -1,3 +1,6 @@
+use itertools::Itertools;
+use std::slice::Iter;
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum SpringState {
     OK,
@@ -9,6 +12,11 @@ pub enum SpringState {
 pub struct Line {
     pub line_state: Vec<SpringState>,
     pub order: Vec<usize>,
+    pub count_unknown: usize,
+}
+
+pub fn count_unknown(line: &Vec<SpringState>) -> usize {
+    line.iter().filter(|s| s == &&SpringState::Unknown).count()
 }
 
 pub fn parse_str_to_spring_state(c: char) -> SpringState {
@@ -21,56 +29,30 @@ pub fn parse_str_to_spring_state(c: char) -> SpringState {
 }
 
 pub fn get_nb_arrangements(line: &Line) -> usize {
-    generate_lines_possible(line)
-        .iter()
-        .filter(|possibility| check_validity(possibility, line.order.clone()))
+    itertools::repeat_n([SpringState::OK, SpringState::KO], line.count_unknown)
+        .multi_cartesian_product()
+        .filter(|o| check_validity(o.iter(), line))
         .count()
 }
 
-fn generate_lines_possible(line: &Line) -> Vec<Vec<SpringState>> {
-    let mut result = Vec::new();
-    generate_strings_helper(&line.line_state, 0, Vec::new(), &mut result);
-    result
+fn check_validity(mut arrangement: Iter<SpringState>, line: &Line) -> bool {
+    let completed_line: Vec<&SpringState> = line
+        .line_state
+        .iter()
+        .map(|c| match c {
+            SpringState::Unknown => arrangement.next().unwrap(),
+            value => value,
+        })
+        .collect();
+    check_validityy(completed_line, &line.order)
 }
 
-fn generate_strings_helper(
-    line: &[SpringState],
-    index: usize,
-    mut current: Vec<SpringState>,
-    result: &mut Vec<Vec<SpringState>>,
-) {
-    if index == line.len() {
-        result.push(current);
-    } else {
-        let current_state = line[index];
-
-        if current_state == SpringState::Unknown {
-            generate_strings_helper(
-                line,
-                index + 1,
-                {
-                    let mut new_current = current.clone();
-                    new_current.push(SpringState::OK);
-                    new_current
-                },
-                result,
-            );
-
-            current.push(SpringState::KO);
-            generate_strings_helper(line, index + 1, current, result);
-        } else {
-            current.push(current_state);
-            generate_strings_helper(line, index + 1, current, result);
-        }
-    }
-}
-
-fn check_validity(line: &&Vec<SpringState>, expected: Vec<usize>) -> bool {
+fn check_validityy(line: Vec<&SpringState>, expected: &Vec<usize>) -> bool {
     let mut counts = Vec::new();
     let mut current_count = 0;
 
     for state in line.iter() {
-        if state == &SpringState::KO {
+        if state == &&SpringState::KO {
             current_count += 1;
         } else if current_count > 0 {
             counts.push(current_count);
@@ -82,5 +64,5 @@ fn check_validity(line: &&Vec<SpringState>, expected: Vec<usize>) -> bool {
         counts.push(current_count);
     }
 
-    counts == expected
+    &counts == expected
 }
