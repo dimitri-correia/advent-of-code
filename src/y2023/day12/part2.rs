@@ -18,13 +18,16 @@ fn parse_input(input: &str) -> Vec<Line> {
             let line_state: Vec<SpringState> = parts[0]
                 .chars()
                 .map(|c| parse_str_to_spring_state(c))
-                .flat_map(|num| std::iter::repeat(num).take(5))
+                .chain(std::iter::once(SpringState::Unknown))
+                .cycle()
+                .take(parts[0].len() * 5 + 4)
                 .collect();
+
             let order: Vec<usize> = parts[1]
                 .split(',')
                 .map(|s| s.parse::<usize>().unwrap())
-                .flat_map(|num| std::iter::repeat(num).take(5))
-                .collect();
+                .collect::<Vec<usize>>()
+                .repeat(5);
             Line { line_state, order }
         })
         .collect()
