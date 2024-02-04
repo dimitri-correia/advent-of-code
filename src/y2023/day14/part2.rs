@@ -1,10 +1,5 @@
-fn main() {
-    let input = include_str!("input1.txt"); //same
-    let output = part_2(input);
-    dbg!(output);
-}
-
 fn part_2(input: &str) -> String {
+    const NUMBER_CYCLE: usize = 1_000_000_000;
     "".to_string()
 }
 
@@ -13,9 +8,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let input = include_str!("input1_ex.txt"); // same
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_2(input);
+        dbg!(&output);
+        assert_eq!("val", output);
+    }
+
+    #[test]
+    fn example_test() {
+        let input = include_str!("input1_ex.txt"); // same file
         let r = part_2(input);
-        assert_eq!("", r);
+        assert_eq!("64", r);
     }
 }
