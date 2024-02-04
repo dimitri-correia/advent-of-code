@@ -1,5 +1,4 @@
 use itertools::Itertools;
-use std::convert::AsRef;
 
 fn part_1(input: &str) -> String {
     input
