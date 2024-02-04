@@ -1,33 +1,8 @@
+use crate::y2023::day13::common::solve;
 use itertools::Itertools;
 
 fn part_1(input: &str) -> String {
-    input
-        .split("\n\n")
-        .into_iter()
-        .map(|p| get_res_one_pattern(p))
-        .sum::<usize>()
-        .to_string()
-}
-
-fn get_res_one_pattern(input: &str) -> usize {
-    match try_find_horizontal_fold(input) {
-        Some(res) => 100 * res,
-        _ => try_find_vertical_fold(&input).unwrap(),
-    }
-}
-
-fn try_find_vertical_fold(lines_input: &str) -> Option<usize> {
-    let lines: Vec<&str> = lines_input.lines().collect();
-
-    let col: Vec<String> = (0..lines[0].len())
-        .map(|i| lines.iter().map(|s| s[i..=i].to_owned()).collect())
-        .collect();
-
-    find_fold(col.iter().map(|c| c.as_str()).collect())
-}
-
-fn try_find_horizontal_fold(lines_input: &str) -> Option<usize> {
-    find_fold(lines_input.lines().collect())
+    solve(input, find_fold)
 }
 
 fn find_fold(lines: Vec<&str>) -> Option<usize> {
