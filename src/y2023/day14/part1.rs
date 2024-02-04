@@ -1,3 +1,5 @@
+use crate::y2023::day14::common::{parse_input, Shape};
+
 fn part_1(input: &str) -> String {
     parse_input(input)
         .into_iter()
@@ -24,36 +26,6 @@ fn get_val_col(col: Vec<Shape>) -> usize {
     }
 
     r + (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>()
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum Shape {
-    RoundedRock,
-    CubeRock,
-    Empty,
-}
-
-fn parse_char(c: char) -> Shape {
-    match c {
-        'O' => Shape::RoundedRock,
-        '.' => Shape::Empty,
-        '#' => Shape::CubeRock,
-        _ => panic!(),
-    }
-}
-
-fn parse_input(input: &str) -> Vec<Vec<Shape>> {
-    let grid: Vec<Vec<Shape>> = input
-        .lines()
-        .map(|l| l.chars().map(|c| parse_char(c)).collect())
-        .collect();
-
-    let rows = grid.len();
-    let cols = grid[0].len();
-
-    (0..cols)
-        .map(|col| (0..rows).map(|row| grid[row][col]).collect())
-        .collect()
 }
 
 #[cfg(test)]
