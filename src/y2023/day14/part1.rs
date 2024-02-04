@@ -7,10 +7,12 @@ fn part_1(input: &str) -> String {
 }
 
 fn get_val_col(col: Vec<Shape>) -> usize {
+    let len = col.len();
+
     let mut r = 0;
     let mut curr_rounded_tot = 0;
-    let len = col.len();
     let mut last_non_cube_rock = len;
+
     for (idx, shape) in col.iter().enumerate() {
         if shape == &Shape::CubeRock {
             r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
@@ -20,9 +22,8 @@ fn get_val_col(col: Vec<Shape>) -> usize {
             curr_rounded_tot += 1;
         }
     }
-    r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
-    dbg!(&r);
-    r
+
+    r + (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>()
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -42,12 +43,10 @@ fn parse_char(c: char) -> Shape {
 }
 
 fn parse_input(input: &str) -> Vec<Vec<Shape>> {
-    let mut grid = Vec::new();
-
-    for line in input.lines() {
-        let row: Vec<Shape> = line.chars().map(|c| parse_char(c)).collect();
-        grid.push(row);
-    }
+    let grid: Vec<Vec<Shape>> = input
+        .lines()
+        .map(|l| l.chars().map(|c| parse_char(c)).collect())
+        .collect();
 
     let rows = grid.len();
     let cols = grid[0].len();
