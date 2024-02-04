@@ -5,7 +5,7 @@ pub enum Shape {
     Empty,
 }
 
-pub fn parse_char(c: char) -> Shape {
+fn parse_char(c: char) -> Shape {
     match c {
         'O' => Shape::RoundedRock,
         '.' => Shape::Empty,
@@ -26,4 +26,24 @@ pub fn parse_input(input: &str) -> Vec<Vec<Shape>> {
     (0..cols)
         .map(|col| (0..rows).map(|row| grid[row][col]).collect())
         .collect()
+}
+
+pub fn get_val_col(col: Vec<Shape>) -> usize {
+    let len = col.len();
+
+    let mut r = 0;
+    let mut curr_rounded_tot = 0;
+    let mut last_non_cube_rock = len;
+
+    for (idx, shape) in col.iter().enumerate() {
+        if shape == &Shape::CubeRock {
+            r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
+            curr_rounded_tot = 0;
+            last_non_cube_rock = len - idx - 1;
+        } else if shape == &Shape::RoundedRock {
+            curr_rounded_tot += 1;
+        }
+    }
+
+    r + (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>()
 }

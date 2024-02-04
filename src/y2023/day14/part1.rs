@@ -1,4 +1,4 @@
-use crate::y2023::day14::common::{parse_input, Shape};
+use crate::y2023::day14::common::{get_val_col, parse_input};
 
 fn part_1(input: &str) -> String {
     parse_input(input)
@@ -6,26 +6,6 @@ fn part_1(input: &str) -> String {
         .map(get_val_col)
         .sum::<usize>()
         .to_string()
-}
-
-fn get_val_col(col: Vec<Shape>) -> usize {
-    let len = col.len();
-
-    let mut r = 0;
-    let mut curr_rounded_tot = 0;
-    let mut last_non_cube_rock = len;
-
-    for (idx, shape) in col.iter().enumerate() {
-        if shape == &Shape::CubeRock {
-            r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
-            curr_rounded_tot = 0;
-            last_non_cube_rock = len - idx - 1;
-        } else if shape == &Shape::RoundedRock {
-            curr_rounded_tot += 1;
-        }
-    }
-
-    r + (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>()
 }
 
 #[cfg(test)]
