@@ -1,11 +1,3 @@
-use crate::Shape::RoundedRock;
-
-fn main() {
-    let input = include_str!("input1.txt");
-    let output = part_1(input);
-    dbg!(output);
-}
-
 fn part_1(input: &str) -> String {
     parse_input(input)
         .into_iter()
@@ -24,7 +16,7 @@ fn get_val_col(col: Vec<Shape>) -> usize {
             r += (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>();
             curr_rounded_tot = 0;
             last_non_cube_rock = len - idx - 1;
-        } else if shape == &RoundedRock {
+        } else if shape == &Shape::RoundedRock {
             curr_rounded_tot += 1;
         }
     }
@@ -70,8 +62,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let input = include_str!("input1_ex.txt");
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_1(input);
+        dbg!(&output);
+        assert_eq!("110407", output);
+    }
+
+    #[test]
+    fn example_test() {
+        let input = include_str!("input1_ex.txt"); // same file
         let r = part_1(input);
         assert_eq!("136", r);
     }
