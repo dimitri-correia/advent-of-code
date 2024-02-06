@@ -13,10 +13,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Install db
-        run: |
-          chmod +x ./test_db.sh
-          ./test_db.sh
       - name: Run tests
         run: cargo test
 
