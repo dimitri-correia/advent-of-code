@@ -20,7 +20,7 @@ pub fn parse_input_row_col(input: &str) -> Vec<Vec<Shape>> {
     change_oder_col_row(col_row)
 }
 
-fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
+pub fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
     input
         .lines()
         .map(|l| l.chars().map(|c| parse_char(c)).collect())
@@ -54,4 +54,29 @@ pub fn get_val_col(col: Vec<Shape>) -> usize {
     }
 
     r + (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_change_oder_col_row_ok() {
+        let input = include_str!("input1_ex.txt");
+        let before = parse_input_col_row(input);
+        let after = (0..4).into_iter().fold(before.clone(), |new_before, _| {
+            change_oder_col_row(new_before)
+        });
+        assert_eq!(before, after);
+    }
+
+    #[test]
+    fn test_change_oder_col_row_ko() {
+        let input = include_str!("input1_ex.txt");
+        let before = parse_input_col_row(input);
+        let after = (0..3).into_iter().fold(before.clone(), |new_before, _| {
+            change_oder_col_row(new_before)
+        });
+        assert_ne!(before, after);
+    }
 }
