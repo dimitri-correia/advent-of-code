@@ -5,7 +5,7 @@ pub enum Shape {
     Empty,
 }
 
-fn parse_char(c: char) -> Shape {
+pub fn parse_char(c: char) -> Shape {
     match c {
         'O' => Shape::RoundedRock,
         '.' => Shape::Empty,
@@ -20,7 +20,7 @@ pub fn parse_input_row_col(input: &str) -> Vec<Vec<Shape>> {
     change_oder_col_row(col_row)
 }
 
-pub fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
+fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
     input
         .lines()
         .map(|l| l.chars().map(|c| parse_char(c)).collect())
