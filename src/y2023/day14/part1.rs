@@ -1,8 +1,7 @@
-use crate::y2023::day14::common::{get_val_col, parse_input};
+use crate::y2023::day14::common::{get_val_col, parse_input_row_col};
 
 fn part_1(input: &str) -> String {
-    parse_input(input)
-        .row_col
+    parse_input_row_col(input)
         .into_iter()
         .map(get_val_col)
         .sum::<usize>()

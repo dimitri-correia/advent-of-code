@@ -1,8 +1,8 @@
-use crate::y2023::day14::common::{get_val_col, parse_input, Shape};
+use crate::y2023::day14::common::{get_val_col, parse_input_col_row, Shape};
 
 fn part_2(input: &str) -> String {
     const NUMBER_CYCLE: usize = 1_000_000_000;
-    let grid = parse_input(input);
+    let grid = parse_input_col_row(input);
     let final_grid = get_final_grid(grid, NUMBER_CYCLE);
 
     final_grid
@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn example_test_3_cycles() {
         let input = include_str!("input1_ex.txt"); // same file
-        let grid = parse_input(input);
+        let grid = parse_input_col_row(input);
         let expected = [
             ".....#....
 ....#...O#
@@ -101,7 +101,7 @@ mod tests {
         let mut new_grid = grid.clone();
         for ex in expected {
             new_grid = get_final_grid(new_grid, 1);
-            let res = parse_input(ex);
+            let res = parse_input_col_row(ex);
             assert_eq!(res, new_grid);
         }
     }

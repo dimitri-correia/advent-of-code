@@ -14,25 +14,22 @@ fn parse_char(c: char) -> Shape {
     }
 }
 
-pub struct ParsingOrder {
-    pub row_col: Vec<Vec<Shape>>,
-    pub col_row: Vec<Vec<Shape>>,
-}
-
-pub fn parse_input(input: &str) -> ParsingOrder {
-    let col_row: Vec<Vec<Shape>> = input
-        .lines()
-        .map(|l| l.chars().map(|c| parse_char(c)).collect())
-        .collect();
+pub fn parse_input_row_col(input: &str) -> Vec<Vec<Shape>> {
+    let col_row: Vec<Vec<Shape>> = parse_input_col_row(input);
 
     let rows = col_row.len();
     let cols = col_row[0].len();
 
-    let row_col = (0..cols)
+    (0..cols)
         .map(|col| (0..rows).map(|row| col_row[row][col]).collect())
-        .collect();
+        .collect()
+}
 
-    ParsingOrder { row_col, col_row }
+pub fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
+    input
+        .lines()
+        .map(|l| l.chars().map(|c| parse_char(c)).collect())
+        .collect()
 }
 
 pub fn get_val_col(col: Vec<Shape>) -> usize {
