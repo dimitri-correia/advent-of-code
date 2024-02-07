@@ -17,18 +17,22 @@ fn parse_char(c: char) -> Shape {
 pub fn parse_input_row_col(input: &str) -> Vec<Vec<Shape>> {
     let col_row: Vec<Vec<Shape>> = parse_input_col_row(input);
 
-    let rows = col_row.len();
-    let cols = col_row[0].len();
-
-    (0..cols)
-        .map(|col| (0..rows).map(|row| col_row[row][col]).collect())
-        .collect()
+    change_oder_col_row(col_row)
 }
 
 pub fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
     input
         .lines()
         .map(|l| l.chars().map(|c| parse_char(c)).collect())
+        .collect()
+}
+
+pub fn change_oder_col_row(old: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
+    let rows = old.len();
+    let cols = old[0].len();
+
+    (0..cols)
+        .map(|col| (0..rows).map(|row| old[row][col]).collect())
         .collect()
 }
 
