@@ -3,9 +3,7 @@ use crate::y2023::day14::common::{get_val_col, parse_input, Shape};
 fn part_2(input: &str) -> String {
     const NUMBER_CYCLE: usize = 1_000_000_000;
     let grid = parse_input(input);
-    let final_grid = (0..NUMBER_CYCLE)
-        .into_iter()
-        .fold(grid, |tmp_grid, _| do_one_cycle(tmp_grid));
+    let final_grid = get_final_grid(grid, NUMBER_CYCLE);
 
     final_grid
         .into_iter()
@@ -14,16 +12,44 @@ fn part_2(input: &str) -> String {
         .to_string()
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum TiltDir {
-    North,
-    West,
-    South,
-    East,
+fn get_final_grid(grid: Vec<Vec<Shape>>, number_cycle: usize) -> Vec<Vec<Shape>> {
+    let final_grid = (0..number_cycle).into_iter().fold(grid, |tmp_grid, _| {
+        // maybe optimize and stop if same grid as before
+        do_east(do_south(do_west(do_north(tmp_grid))))
+    });
+    final_grid
 }
 
-fn do_one_cycle(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid
+fn do_east(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
+    grid.iter().map(|line| move_o_east(line)).collect()
+}
+
+fn move_o_east(p0: &Vec<Shape>) -> B {
+    todo!()
+}
+
+fn do_south(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
+    grid.iter().map(|line| move_o_south(line)).collect()
+}
+
+fn move_o_south(p0: &Vec<Shape>) -> B {
+    todo!()
+}
+
+fn do_west(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
+    grid.iter().map(|line| move_o_west(line)).collect()
+}
+
+fn move_o_west(p0: &Vec<Shape>) -> B {
+    todo!()
+}
+
+fn do_north(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
+    grid.iter().map(|line| move_o_north(line)).collect()
+}
+
+fn move_o_north(line: &[Shape]) -> Vec<Shape> {
+    todo!()
 }
 
 #[cfg(test)]
@@ -43,5 +69,48 @@ mod tests {
         let input = include_str!("input1_ex.txt"); // same file
         let r = part_2(input);
         assert_eq!("64", r);
+    }
+
+    #[test]
+    fn example_test_3_cycles() {
+        let input = include_str!("input1_ex.txt"); // same file
+        let grid = parse_input(input);
+        let expected = [
+            ".....#....
+....#...O#
+...OO##...
+.OO#......
+.....OOO#.
+.O#...O#.#
+....O#....
+......OOOO
+#...O###..
+#..OO#....",
+            ".....#....
+....#...O#
+.....##...
+..O#......
+.....OOO#.
+.O#...O#.#
+....O#...O
+.......OOO
+#..OO###..
+#.OOO#...O",
+            ".....#....
+....#...O#
+.....##...
+..O#......
+.....OOO#.
+.O#...O#.#
+....O#...O
+.......OOO
+#...O###.O",
+        ];
+        let mut new_grid = grid.clone();
+        for ex in expected {
+            new_grid = get_final_grid(new_grid, 1);
+            let res = parse_input(ex);
+            assert_eq!(res, new_grid);
+        }
     }
 }
