@@ -28,24 +28,30 @@ fn get_final_grid(grid: Vec<Vec<Shape>>, number_cycle: usize) -> Vec<Vec<Shape>>
 }
 
 fn do_east(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid.iter().map(|line| move_o_right(line)).collect()
+    change_oder_col_row(grid)
+        .iter()
+        .map(|line| move_o_right(line))
+        .collect()
 }
 
 fn do_south(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
+    change_oder_col_row(grid)
+        .iter()
+        .map(|line| move_o_right(line))
+        .collect()
+}
+
+fn do_west(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
     change_oder_col_row(grid)
         .iter()
         .map(|line| move_o_left(line))
         .collect()
 }
 
-fn do_west(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid.iter().map(|line| move_o_left(line)).collect()
-}
-
 fn do_north(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
     change_oder_col_row(grid)
         .iter()
-        .map(|line| move_o_right(line))
+        .map(|line| move_o_left(line))
         .collect()
 }
 
@@ -114,6 +120,7 @@ fn move_o_left(v: &Vec<Shape>) -> Vec<Shape> {
 mod tests {
     use super::*;
     use crate::y2023::day14::common::parse_char;
+    use itertools::Itertools;
 
     // #[test]
     // fn actual_challenge() {
@@ -132,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_do_north() {
-        let input = include_str!("input1.txt");
+        let input = include_str!("input1_ex.txt");
         let before = parse_input_row_col(input);
         let expected = parse_input_row_col(
             "OOOO.#.O..
@@ -147,6 +154,9 @@ O..#.OO...
 #....#....",
         );
         let computed = do_north(before);
+
+        helper_print(&computed);
+        helper_print(&expected);
 
         assert_eq!(expected, computed);
     }
@@ -221,6 +231,24 @@ O..#.OO...
             new_grid = get_final_grid(new_grid, 1);
             let res = parse_input_row_col(ex);
             assert_eq!(res, new_grid);
+            dbg!("one cycle ok");
+        }
+    }
+
+    fn helper_print(v: &Vec<Vec<Shape>>) -> String {
+        let p = change_oder_col_row(v.clone())
+            .iter()
+            .map(|row| row.iter().map(|s| inverse_parse(s)).collect::<String>())
+            .join("\n");
+
+        dbg!(p)
+    }
+
+    pub fn inverse_parse(s: &Shape) -> char {
+        match s {
+            Shape::RoundedRock => 'O',
+            Shape::Empty => '.',
+            Shape::CubeRock => '#',
         }
     }
 }
