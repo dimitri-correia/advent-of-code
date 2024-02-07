@@ -21,34 +21,26 @@ fn get_final_grid(grid: Vec<Vec<Shape>>, number_cycle: usize) -> Vec<Vec<Shape>>
 }
 
 fn do_east(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid.iter().map(|line| move_o_east(line)).collect()
-}
-
-fn move_o_east(p0: &Vec<Shape>) -> B {
-    todo!()
+    grid.iter().map(|line| move_o_right(line)).collect()
 }
 
 fn do_south(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid.iter().map(|line| move_o_south(line)).collect()
-}
-
-fn move_o_south(p0: &Vec<Shape>) -> B {
-    todo!()
+    grid.iter().map(|line| move_o_left(line)).collect()
 }
 
 fn do_west(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid.iter().map(|line| move_o_west(line)).collect()
-}
-
-fn move_o_west(p0: &Vec<Shape>) -> B {
-    todo!()
+    grid.iter().map(|line| move_o_left(line)).collect()
 }
 
 fn do_north(grid: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    grid.iter().map(|line| move_o_north(line)).collect()
+    grid.iter().map(|line| move_o_right(line)).collect()
 }
 
-fn move_o_north(line: &[Shape]) -> Vec<Shape> {
+fn move_o_right(v: &[Shape]) -> Vec<Shape> {
+    todo!()
+}
+
+fn move_o_left(v: &Vec<Shape>) -> Vec<Shape> {
     todo!()
 }
 
