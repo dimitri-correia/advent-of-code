@@ -20,58 +20,22 @@ fn part_2(input: &str) -> String {
 }
 
 fn get_final_grid(grid: Grid, number_cycle: usize) -> Grid {
-    assert_eq!(grid.order, Order::ColRow);
-    let final_grid = (0..number_cycle).into_iter().fold(grid, |tmp_grid, _| {
-        do_east(do_south(do_west(do_north(tmp_grid))))
-    });
-    assert_eq!(final_grid.order, Order::ColRow);
-    final_grid
+    (0..number_cycle).into_iter().fold(grid, |tmp_grid, _| {
+        do_quarter_of_tilt(
+            do_quarter_of_tilt(
+                do_quarter_of_tilt(do_quarter_of_tilt(tmp_grid, move_o_left), move_o_left),
+                move_o_right,
+            ),
+            move_o_right,
+        )
+    })
 }
 
-fn do_east(grid: Grid) -> Grid {
-    assert_eq!(grid.order, Order::RowCol);
+fn do_quarter_of_tilt(grid: Grid, movement: fn(&Vec<Shape>) -> Vec<Shape>) -> Grid {
     let new_grid = change_oder_col_row(grid);
 
     Grid {
-        grid: new_grid
-            .grid
-            .iter()
-            .map(|line| move_o_right(line))
-            .collect(),
-        order: new_grid.order,
-    }
-}
-
-fn do_south(grid: Grid) -> Grid {
-    assert_eq!(grid.order, Order::ColRow);
-    let new_grid = change_oder_col_row(grid);
-
-    Grid {
-        grid: new_grid
-            .grid
-            .iter()
-            .map(|line| move_o_right(line))
-            .collect(),
-        order: new_grid.order,
-    }
-}
-
-fn do_west(grid: Grid) -> Grid {
-    assert_eq!(grid.order, Order::RowCol);
-    let new_grid = change_oder_col_row(grid);
-
-    Grid {
-        grid: new_grid.grid.iter().map(|line| move_o_left(line)).collect(),
-        order: new_grid.order,
-    }
-}
-
-fn do_north(grid: Grid) -> Grid {
-    assert_eq!(grid.order, Order::ColRow);
-    let new_grid = change_oder_col_row(grid);
-
-    Grid {
-        grid: new_grid.grid.iter().map(|line| move_o_left(line)).collect(),
+        grid: new_grid.grid.iter().map(|line| movement(line)).collect(),
         order: new_grid.order,
     }
 }
@@ -174,7 +138,7 @@ O..#.OO...
 #....###..
 #....#....",
         );
-        let computed = do_north(before);
+        let computed = do_quarter_of_tilt(before, move_o_left);
 
         helper_print(&computed);
         helper_print(&expected);
