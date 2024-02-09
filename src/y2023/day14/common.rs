@@ -14,26 +14,48 @@ pub fn parse_char(c: char) -> Shape {
     }
 }
 
-pub fn parse_input_row_col(input: &str) -> Vec<Vec<Shape>> {
-    let col_row: Vec<Vec<Shape>> = parse_input_col_row(input);
+pub fn parse_input_row_col(input: &str) -> Grid {
+    let col_row = parse_input_col_row(input);
 
     change_oder_col_row(col_row)
 }
 
-pub fn parse_input_col_row(input: &str) -> Vec<Vec<Shape>> {
-    input
-        .lines()
-        .map(|l| l.chars().map(|c| parse_char(c)).collect())
-        .collect()
+pub fn parse_input_col_row(input: &str) -> Grid {
+    Grid {
+        grid: input
+            .lines()
+            .map(|l| l.chars().map(|c| parse_char(c)).collect())
+            .collect(),
+        order: Order::ColRow,
+    }
 }
 
-pub fn change_oder_col_row(old: Vec<Vec<Shape>>) -> Vec<Vec<Shape>> {
-    let rows = old.len();
-    let cols = old[0].len();
+#[derive(Eq, PartialEq, Clone, Debug)]
+pub struct Grid {
+    pub grid: Vec<Vec<Shape>>,
+    pub order: Order,
+}
 
-    (0..cols)
-        .map(|col| (0..rows).map(|row| old[row][col]).collect())
-        .collect()
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+pub enum Order {
+    RowCol,
+    ColRow,
+}
+
+pub fn change_oder_col_row(old: Grid) -> Grid {
+    let rows = old.grid.len();
+    let cols = old.grid[0].len();
+
+    Grid {
+        grid: (0..cols)
+            .map(|col| (0..rows).map(|row| old.grid[row][col]).collect())
+            .collect(),
+        order: if old.order == Order::ColRow {
+            Order::RowCol
+        } else {
+            Order::ColRow
+        },
+    }
 }
 
 pub fn get_val_col(col: Vec<Shape>) -> usize {
