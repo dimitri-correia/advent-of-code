@@ -115,6 +115,7 @@ mod tests {
     //     assert_eq!("val", output);
     // }
     //
+
     #[test]
     fn example_test() {
         let input = include_str!("input1_ex.txt"); // same file
@@ -124,8 +125,6 @@ mod tests {
 
     #[test]
     fn test_do_north() {
-        let input = include_str!("input1_ex.txt");
-        let before = parse_input_col_row(input);
         let expected = parse_input_row_col(
             "OOOO.#.O..
 OO..#....#
@@ -138,11 +137,9 @@ O..#.OO...
 #....###..
 #....#....",
         );
+        let input = include_str!("input1_ex.txt");
+        let before = parse_input_col_row(input);
         let computed = do_quarter_of_tilt(before, move_o_left);
-
-        helper_print(&computed);
-        helper_print(&expected);
-
         assert_eq!(expected, computed);
     }
 
@@ -216,14 +213,12 @@ O..#.OO...
         for ex in expected {
             new_grid = get_final_grid(new_grid, 1);
             let res = parse_input_col_row(ex);
-            helper_print(&res);
             assert_eq!(res.order, new_grid.order);
             assert_eq!(res.grid, new_grid.grid);
-            dbg!("one cycle ok");
         }
     }
 
-    fn helper_print(v: &Grid) -> String {
+    fn _helper_print(v: &Grid) -> String {
         fn inverse_parse(s: &Shape) -> char {
             match s {
                 Shape::RoundedRock => 'O',
