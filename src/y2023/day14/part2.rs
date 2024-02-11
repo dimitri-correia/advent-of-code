@@ -41,34 +41,35 @@ fn do_quarter_of_tilt(grid: Grid, movement: fn(&Vec<Shape>) -> Vec<Shape>) -> Gr
 }
 
 fn move_o_right(v: &Vec<Shape>) -> Vec<Shape> {
-    let mut new_v: Vec<Shape> = vec![];
-    let mut rounded = 0;
-    let mut empty = 0;
-    for shape in v.iter().rev() {
-        match shape {
-            Shape::CubeRock => {
-                (0..rounded)
-                    .into_iter()
-                    .for_each(|_| new_v.push(Shape::RoundedRock));
-                (0..empty)
-                    .into_iter()
-                    .for_each(|_| new_v.push(Shape::Empty));
-                new_v.push(Shape::CubeRock);
-                rounded = 0;
-                empty = 0;
+    let right = true;
+    //let v = if right { v.iter().rev() } else { v.iter() };
+    let mut f = v
+        .iter()
+        .rev()
+        .fold((vec![], 0, 0), |(mut v, mut rounded, mut empty), shape| {
+            match shape {
+                Shape::CubeRock => {
+                    (0..rounded)
+                        .into_iter()
+                        .for_each(|_| v.push(Shape::RoundedRock));
+                    (0..empty).into_iter().for_each(|_| v.push(Shape::Empty));
+                    v.push(Shape::CubeRock);
+                    rounded = 0;
+                    empty = 0;
+                }
+                Shape::RoundedRock => rounded += 1,
+                Shape::Empty => empty += 1,
             }
-            Shape::RoundedRock => rounded += 1,
-            Shape::Empty => empty += 1,
-        }
+            (v, rounded, empty)
+        });
+    (0..f.1)
+        .into_iter()
+        .for_each(|_| f.0.push(Shape::RoundedRock));
+    (0..f.2).into_iter().for_each(|_| f.0.push(Shape::Empty));
+    if right {
+        f.0.reverse()
     }
-    (0..rounded)
-        .into_iter()
-        .for_each(|_| new_v.push(Shape::RoundedRock));
-    (0..empty)
-        .into_iter()
-        .for_each(|_| new_v.push(Shape::Empty));
-    new_v.reverse();
-    new_v
+    f.0
 }
 
 fn move_o_left(v: &Vec<Shape>) -> Vec<Shape> {
