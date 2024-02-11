@@ -7,44 +7,39 @@ fn part_2(input: &str) -> String {
     const NUMBER_CYCLE: usize = 1_000; // 1_000_000_000;
 
     // as first element of cycle is north, we need to have the first grid in row_col format
-    let grid = parse_input_col_row(input);
+    let mut grid = parse_input_col_row(input);
 
     // also in row_col format
-    let final_grid = get_final_grid(grid, NUMBER_CYCLE);
+    get_final_grid(&mut grid, NUMBER_CYCLE);
 
-    final_grid
-        .grid
+    grid.grid
         .into_iter()
         .map(get_val_col) // todo
         .sum::<usize>()
         .to_string()
 }
 
-fn get_final_grid(grid: Grid, number_cycle: usize) -> Grid {
+fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
     let mut hashes = vec![calculate_hash(&grid)];
-    (0..number_cycle)
-        .into_iter()
-        .fold(grid, |tmp_grid, already_done_cycle| {
-            let new_grid = do_quarter_of_tilt(
-                do_quarter_of_tilt(
-                    do_quarter_of_tilt(do_quarter_of_tilt(tmp_grid, move_o_left), move_o_left),
-                    move_o_right,
-                ),
-                move_o_right,
-            );
-            let hash = calculate_hash(&new_grid);
-            let a = hashes
-                .iter()
-                .enumerate()
-                .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
-            if a.is_some() {
-                dbg!(&hashes);
-                let remaining = number_cycle - already_done_cycle;
-                return new_grid;
-            }
-            hashes.push(hash);
-            new_grid
-        })
+
+    for already_done_cycle in 0..number_cycle {
+        do_quarter_of_tilt(grid, move_o_right);
+        do_quarter_of_tilt(grid, move_o_right);
+        do_quarter_of_tilt(grid, move_o_left);
+        do_quarter_of_tilt(grid, move_o_left);
+        let hash = calculate_hash(&grid);
+        let a = hashes
+            .iter()
+            .enumerate()
+            .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
+        if a.is_some() {
+            dbg!(&hashes);
+            let remaining = number_cycle - already_done_cycle;
+            grid = new_grid;
+            return;
+        }
+        hashes.push(hash);
+    }
 }
 
 fn calculate_hash(g: &Grid) -> u64 {
@@ -53,13 +48,13 @@ fn calculate_hash(g: &Grid) -> u64 {
     h.finish()
 }
 
-fn do_quarter_of_tilt(grid: Grid, movement: fn(&Vec<Shape>) -> Vec<Shape>) -> Grid {
+fn do_quarter_of_tilt(grid: &mut Grid, movement: fn(&Vec<Shape>) -> Vec<Shape>) {
     let new_grid = change_oder_col_row(grid);
 
-    Grid {
+    grid = &mut Grid {
         grid: new_grid.grid.iter().map(|line| movement(line)).collect(),
         order: new_grid.order,
-    }
+    };
 }
 
 fn move_o_right(v: &Vec<Shape>) -> Vec<Shape> {
