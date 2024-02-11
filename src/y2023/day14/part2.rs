@@ -138,6 +138,50 @@ mod tests {
     }
 
     #[test]
+    fn test_3_cycles() {
+        let input = include_str!("input1_ex.txt"); // same file
+        let mut grid = parse_input_col_row(input);
+        let expected = [
+            ".....#....
+....#...O#
+...OO##...
+.OO#......
+.....OOO#.
+.O#...O#.#
+....O#....
+......OOOO
+#...O###..
+#..OO#....",
+            ".....#....
+....#...O#
+.....##...
+..O#......
+.....OOO#.
+.O#...O#.#
+....O#...O
+.......OOO
+#..OO###..
+#.OOO#...O",
+            ".....#....
+....#...O#
+.....##...
+..O#......
+.....OOO#.
+.O#...O#.#
+....O#...O
+.......OOO
+#...O###.O
+#.OOO#...O",
+        ];
+        for ex in expected {
+            get_final_grid(&mut grid, 1);
+            let res = parse_input_col_row(ex);
+            assert_eq!(res.order, grid.order);
+            assert_eq!(res.grid, grid.grid);
+        }
+    }
+
+    #[test]
     fn test_do_north() {
         let expected = parse_input_row_col(
             "OOOO.#.O..
@@ -186,50 +230,6 @@ O..#.OO...
         let computed = move_o_left(&before);
 
         assert_eq!(expected, computed);
-    }
-
-    #[test]
-    fn test_3_cycles() {
-        let input = include_str!("input1_ex.txt"); // same file
-        let mut grid = parse_input_col_row(input);
-        let expected = [
-            ".....#....
-....#...O#
-...OO##...
-.OO#......
-.....OOO#.
-.O#...O#.#
-....O#....
-......OOOO
-#...O###..
-#..OO#....",
-            ".....#....
-....#...O#
-.....##...
-..O#......
-.....OOO#.
-.O#...O#.#
-....O#...O
-.......OOO
-#..OO###..
-#.OOO#...O",
-            ".....#....
-....#...O#
-.....##...
-..O#......
-.....OOO#.
-.O#...O#.#
-....O#...O
-.......OOO
-#...O###.O
-#.OOO#...O",
-        ];
-        for ex in expected {
-            get_final_grid(&mut grid, 1);
-            let res = parse_input_col_row(ex);
-            assert_eq!(res.order, grid.order);
-            assert_eq!(res.grid, grid.grid);
-        }
     }
 
     fn _helper_print(v: &Grid) -> String {
