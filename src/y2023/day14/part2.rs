@@ -1,5 +1,5 @@
 use crate::y2023::day14::common::{
-    change_oder_col_row, get_val_col, parse_input_col_row, Grid, Order, Shape,
+    change_order_col_row, get_val_col, parse_input_col_row, Grid, Shape,
 };
 use std::hash::{DefaultHasher, Hash, Hasher};
 
@@ -34,8 +34,7 @@ fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
             .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
         if a.is_some() {
             dbg!(&hashes);
-            let remaining = number_cycle - already_done_cycle;
-            grid = new_grid;
+            //let remaining = number_cycle - already_done_cycle;
             return;
         }
         hashes.push(hash);
@@ -49,12 +48,9 @@ fn calculate_hash(g: &Grid) -> u64 {
 }
 
 fn do_quarter_of_tilt(grid: &mut Grid, movement: fn(&Vec<Shape>) -> Vec<Shape>) {
-    let new_grid = change_oder_col_row(grid);
+    change_order_col_row(grid);
 
-    grid = &mut Grid {
-        grid: new_grid.grid.iter().map(|line| movement(line)).collect(),
-        order: new_grid.order,
-    };
+    grid.grid = grid.grid.iter().map(|line| movement(line)).collect();
 }
 
 fn move_o_right(v: &Vec<Shape>) -> Vec<Shape> {
@@ -122,7 +118,7 @@ fn move_o_left(v: &Vec<Shape>) -> Vec<Shape> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::y2023::day14::common::{parse_char, parse_input_row_col};
+    use crate::y2023::day14::common::{parse_char, parse_input_row_col, Order};
     use itertools::Itertools;
 
     // #[test]
@@ -157,8 +153,9 @@ O..#.OO...
         );
         let input = include_str!("input1_ex.txt");
         let before = parse_input_col_row(input);
-        let computed = do_quarter_of_tilt(before, move_o_left);
-        assert_eq!(expected, computed);
+        let mut after = before.clone();
+        do_quarter_of_tilt(&mut after, move_o_left);
+        assert_eq!(expected, after);
     }
 
     #[test]
@@ -194,7 +191,7 @@ O..#.OO...
     #[test]
     fn test_3_cycles() {
         let input = include_str!("input1_ex.txt"); // same file
-        let grid = parse_input_col_row(input);
+        let mut grid = parse_input_col_row(input);
         let expected = [
             ".....#....
 ....#...O#
@@ -227,16 +224,16 @@ O..#.OO...
 #...O###.O
 #.OOO#...O",
         ];
-        let mut new_grid = grid.clone();
         for ex in expected {
-            new_grid = get_final_grid(new_grid, 1);
+            get_final_grid(&mut grid, 1);
             let res = parse_input_col_row(ex);
-            assert_eq!(res.order, new_grid.order);
-            assert_eq!(res.grid, new_grid.grid);
+            assert_eq!(res.order, grid.order);
+            assert_eq!(res.grid, grid.grid);
         }
     }
 
     fn _helper_print(v: &Grid) -> String {
+        let mut grid = v.clone();
         fn inverse_parse(s: &Shape) -> char {
             match s {
                 Shape::RoundedRock => 'O',
@@ -244,12 +241,10 @@ O..#.OO...
                 Shape::CubeRock => '#',
             }
         }
-        let g = if v.order == Order::RowCol {
-            change_oder_col_row(v.clone())
-        } else {
-            v.clone()
+        if grid.order == Order::RowCol {
+            change_order_col_row(&mut grid)
         };
-        let p = g
+        let p = grid
             .grid
             .iter()
             .map(|row| row.iter().map(|s| inverse_parse(s)).collect::<String>())

@@ -15,9 +15,11 @@ pub fn parse_char(c: char) -> Shape {
 }
 
 pub fn parse_input_row_col(input: &str) -> Grid {
-    let col_row = parse_input_col_row(input);
+    let mut grid = parse_input_col_row(input);
 
-    change_oder_col_row(col_row)
+    change_order_col_row(&mut grid);
+
+    grid
 }
 
 pub fn parse_input_col_row(input: &str) -> Grid {
@@ -42,20 +44,20 @@ pub enum Order {
     ColRow,
 }
 
-pub fn change_oder_col_row(old: Grid) -> Grid {
+pub fn change_order_col_row(old: &mut Grid) {
     let rows = old.grid.len();
     let cols = old.grid[0].len();
 
-    Grid {
-        grid: (0..cols)
-            .map(|col| (0..rows).map(|row| old.grid[row][col]).collect())
-            .collect(),
-        order: if old.order == Order::ColRow {
-            Order::RowCol
-        } else {
-            Order::ColRow
-        },
-    }
+    let new_grid = (0..cols)
+        .map(|col| (0..rows).map(|row| old.grid[row][col]).collect())
+        .collect();
+
+    old.grid = new_grid;
+    old.order = if old.order == Order::ColRow {
+        Order::RowCol
+    } else {
+        Order::ColRow
+    };
 }
 
 pub fn get_val_col(col: Vec<Shape>) -> usize {
@@ -86,9 +88,10 @@ mod tests {
     fn test_change_oder_col_row_ok() {
         let input = include_str!("input1_ex.txt");
         let before = parse_input_col_row(input);
-        let after = (0..4).into_iter().fold(before.clone(), |new_before, _| {
-            change_oder_col_row(new_before)
-        });
+        let mut after = before.clone();
+        (0..4)
+            .into_iter()
+            .for_each(|_| change_order_col_row(&mut after));
         assert_eq!(before, after);
     }
 
@@ -96,9 +99,10 @@ mod tests {
     fn test_change_oder_col_row_ko() {
         let input = include_str!("input1_ex.txt");
         let before = parse_input_col_row(input);
-        let after = (0..3).into_iter().fold(before.clone(), |new_before, _| {
-            change_oder_col_row(new_before)
-        });
-        assert_ne!(before, after);
+        let mut after = before.clone();
+        (0..3)
+            .into_iter()
+            .for_each(|_| change_order_col_row(&mut after));
+        assert_eq!(before, after);
     }
 }
