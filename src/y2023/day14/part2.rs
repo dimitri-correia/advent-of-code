@@ -23,10 +23,10 @@ fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
     let mut hashes = vec![calculate_hash(&grid)];
 
     for already_done_cycle in 0..number_cycle {
-        do_quarter_of_tilt(grid, move_o_right);
-        do_quarter_of_tilt(grid, move_o_right);
         do_quarter_of_tilt(grid, move_o_left);
         do_quarter_of_tilt(grid, move_o_left);
+        do_quarter_of_tilt(grid, move_o_right);
+        do_quarter_of_tilt(grid, move_o_right);
         let hash = calculate_hash(&grid);
         let a = hashes
             .iter()
@@ -151,6 +151,7 @@ mod tests {
             let res = parse_input_col_row(ex);
             assert_eq!(res.order, grid.order);
             assert_eq!(res.grid, grid.grid);
+            dbg!("line ok");
         }
     }
 
