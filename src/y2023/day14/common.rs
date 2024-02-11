@@ -1,4 +1,4 @@
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Shape {
     RoundedRock,
     CubeRock,
@@ -30,13 +30,13 @@ pub fn parse_input_col_row(input: &str) -> Grid {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Debug)]
+#[derive(Eq, PartialEq, Clone, Debug, Hash)]
 pub struct Grid {
     pub grid: Vec<Vec<Shape>>,
     pub order: Order,
 }
 
-#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Eq, PartialEq, Copy, Clone, Debug, Hash)]
 pub enum Order {
     RowCol,
     ColRow,
