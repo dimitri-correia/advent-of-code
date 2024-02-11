@@ -1,9 +1,10 @@
 use crate::y2023::day14::common::{
     change_oder_col_row, get_val_col, parse_input_col_row, Grid, Order, Shape,
 };
+use std::hash::{DefaultHasher, Hash, Hasher};
 
 fn part_2(input: &str) -> String {
-    const NUMBER_CYCLE: usize = 1_000_000_000;
+    const NUMBER_CYCLE: usize = 1_000; // 1_000_000_000;
 
     // as first element of cycle is north, we need to have the first grid in row_col format
     let grid = parse_input_col_row(input);
@@ -20,15 +21,36 @@ fn part_2(input: &str) -> String {
 }
 
 fn get_final_grid(grid: Grid, number_cycle: usize) -> Grid {
-    (0..number_cycle).into_iter().fold(grid, |tmp_grid, _| {
-        do_quarter_of_tilt(
-            do_quarter_of_tilt(
-                do_quarter_of_tilt(do_quarter_of_tilt(tmp_grid, move_o_left), move_o_left),
+    let mut hashes = vec![calculate_hash(&grid)];
+    (0..number_cycle)
+        .into_iter()
+        .fold(grid, |tmp_grid, already_done_cycle| {
+            let new_grid = do_quarter_of_tilt(
+                do_quarter_of_tilt(
+                    do_quarter_of_tilt(do_quarter_of_tilt(tmp_grid, move_o_left), move_o_left),
+                    move_o_right,
+                ),
                 move_o_right,
-            ),
-            move_o_right,
-        )
-    })
+            );
+            let hash = calculate_hash(&new_grid);
+            let a = hashes
+                .iter()
+                .enumerate()
+                .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
+            if a.is_some() {
+                dbg!(&hashes);
+                let remaining = number_cycle - already_done_cycle;
+                return new_grid;
+            }
+            hashes.push(hash);
+            new_grid
+        })
+}
+
+fn calculate_hash(g: &Grid) -> u64 {
+    let mut h = DefaultHasher::new();
+    g.hash(&mut h);
+    h.finish()
 }
 
 fn do_quarter_of_tilt(grid: Grid, movement: fn(&Vec<Shape>) -> Vec<Shape>) -> Grid {
