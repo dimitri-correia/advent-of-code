@@ -4,7 +4,7 @@ use crate::y2023::day14::common::{
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 fn part_2(input: &str) -> String {
-    const NUMBER_CYCLE: usize = 1_000; // 1_000_000_000;
+    const NUMBER_CYCLE: usize = 1_000_000_000;
 
     // as first element of cycle is north, we need to have the first grid in row_col format
     let mut grid = parse_input_col_row(input);
@@ -32,9 +32,11 @@ fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
             .iter()
             .enumerate()
             .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
-        if a.is_some() {
-            dbg!(&hashes);
-            //let remaining = number_cycle - already_done_cycle;
+        if let Some(a) = a {
+            let cycle_length = hashes.len() - a;
+            let remaining = (number_cycle - already_done_cycle) % cycle_length;
+            dbg!(&remaining);
+            get_final_grid(grid, remaining);
             return;
         }
         hashes.push(hash);
