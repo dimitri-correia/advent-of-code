@@ -142,36 +142,9 @@ mod tests {
         let input = include_str!("input1_ex.txt"); // same file
         let mut grid = parse_input_col_row(input);
         let expected = [
-            ".....#....
-....#...O#
-...OO##...
-.OO#......
-.....OOO#.
-.O#...O#.#
-....O#....
-......OOOO
-#...O###..
-#..OO#....",
-            ".....#....
-....#...O#
-.....##...
-..O#......
-.....OOO#.
-.O#...O#.#
-....O#...O
-.......OOO
-#..OO###..
-#.OOO#...O",
-            ".....#....
-....#...O#
-.....##...
-..O#......
-.....OOO#.
-.O#...O#.#
-....O#...O
-.......OOO
-#...O###.O
-#.OOO#...O",
+            ".....#....\n....#...O#\n...OO##...\n.OO#......\n.....OOO#.\n.O#...O#.#\n....O#....\n......OOOO\n#...O###..\n#..OO#....",
+            ".....#....\n....#...O#\n.....##...\n..O#......\n.....OOO#.\n.O#...O#.#\n....O#...O\n.......OOO\n#..OO###..\n#.OOO#...O",
+            ".....#....\n....#...O#\n.....##...\n..O#......\n.....OOO#.\n.O#...O#.#\n....O#...O\n.......OOO\n#...O###.O\n#.OOO#...O",
         ];
         for ex in expected {
             get_final_grid(&mut grid, 1);
@@ -184,16 +157,7 @@ mod tests {
     #[test]
     fn test_do_north() {
         let expected = parse_input_row_col(
-            "OOOO.#.O..
-OO..#....#
-OO..O##..O
-O..#.OO...
-........#.
-..#....#.#
-..O..#.O.O
-..O.......
-#....###..
-#....#....",
+            "OOOO.#.O..\nOO..#....#\nOO..O##..O\nO..#.OO...\n........#.\n..#....#.#\n..O..#.O.O\n..O.......\n#....###..\n#....#....",
         );
         let input = include_str!("input1_ex.txt");
         let before = parse_input_col_row(input);
