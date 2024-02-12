@@ -84,12 +84,9 @@ fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
 enum Tile {
     Empty,
     MirrorBLUR,
-    // / bottom left upper right
     MirrorULBR,
-    // \ upper left bottom right
     SplitterH,
-    // | horizontal
-    SplitterV, // - vertical
+    SplitterV,
 }
 
 fn parse_tile(c: char) -> Tile {
@@ -132,15 +129,10 @@ struct Position {
 }
 
 fn parse_input(input: &str) -> Vec<Vec<Tile>> {
-    let mut grid = vec![];
-    for line in input.lines() {
-        let mut row = vec![];
-        for c in line.chars() {
-            row.push(parse_tile(c));
-        }
-        grid.push(row);
-    }
-    grid
+    input
+        .lines()
+        .map(|line| line.chars().map(parse_tile).collect::<Vec<Tile>>())
+        .collect()
 }
 
 #[cfg(test)]
