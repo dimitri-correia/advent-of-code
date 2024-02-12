@@ -4,31 +4,9 @@ use std::collections::HashSet;
 fn part_2(input: &str) -> String {
     let grid = parse_input(input);
 
-    (0..grid.len())
-        .flat_map(|x| {
-            (0..grid[0].len())
-                .filter_map(|y| {
-                    if x == 0 || y == 0 || x == grid.len() - 1 || y == grid[0].len() - 1 {
-                        let dir = if x == 0 {
-                            Dir::Right
-                        } else if y == 0 {
-                            Dir::Down
-                        } else if x == grid.len() - 1 {
-                            Dir::Left
-                        } else {
-                            Dir::Up
-                        };
-                        Some((Coord(x as isize, y as isize), dir))
-                    } else {
-                        None
-                    }
-                })
-                .collect::<Vec<(Coord, Dir)>>()
-        })
-        .inspect(|(pos, dir)| {
-            dbg!(&pos, &dir);
-        })
-        .map(|(pos, dir)| {
+    generate_all_starts(&grid)
+        .iter()
+        .map(|&(dir, pos)| {
             let mut energized: HashSet<Position> = HashSet::new();
             get_dirs_from_tile(&Position { pos, dir }, grid[0][0])
                 .iter()
@@ -47,7 +25,24 @@ fn part_2(input: &str) -> String {
         .to_string()
 }
 
-fn generate_all_starts
+fn generate_all_starts(grid: &[Vec<Tile>]) -> Vec<(Dir, Coord)> {
+    let row_count = grid.len();
+    let col_count = grid[0].len();
+    (0..row_count)
+        .flat_map(|index| {
+            [
+                (Dir::Down, Coord(index as isize, 0)),
+                (Dir::Up, Coord(index as isize, row_count as isize - 1)),
+            ]
+        })
+        .chain((0..col_count).flat_map(|index| {
+            [
+                (Dir::Left, Coord(col_count as isize - 1, index as isize)),
+                (Dir::Right, Coord(0, index as isize)),
+            ]
+        }))
+        .collect()
+}
 
 fn follow_path(grid: &[Vec<Tile>], energized: &mut HashSet<Position>, pos: Position) {
     if energized.contains(&pos) {
@@ -96,5 +91,31 @@ mod tests {
         let input = include_str!("input1_ex.txt");
         let r = part_2(input);
         assert_eq!("51", r);
+    }
+
+    #[test]
+    fn test_generate_all_starts() {
+        let grid = parse_input("...\n...\n...");
+        let all_starts = generate_all_starts(&grid);
+        assert_eq!(12, all_starts.len());
+        assert!([
+            (Dir::Down, Coord(0, 0)),
+            (Dir::Right, Coord(0, 0)),
+            (Dir::Right, Coord(0, 1)),
+            (Dir::Right, Coord(0, 2)),
+            (Dir::Up, Coord(0, 2)),
+            (Dir::Up, Coord(1, 2)),
+            (Dir::Up, Coord(2, 2)),
+            (Dir::Left, Coord(2, 2)),
+            (Dir::Left, Coord(2, 1)),
+            (Dir::Left, Coord(2, 0)),
+            (Dir::Down, Coord(2, 0)),
+            (Dir::Down, Coord(1, 0)),
+        ]
+        .iter()
+        .inspect(|dc| {
+            dbg!(&dc);
+        })
+        .all(|dc| all_starts.contains(dc)))
     }
 }
