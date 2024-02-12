@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 fn part_2(input: &str) -> String {
-    let boxes = parse_input(input)
+    parse_input(input)
         .iter()
         .fold(HashMap::new(), |mut boxes, step| {
             let lens_box: &mut Vec<Lens> = boxes.entry(compute_box_label(step)).or_default();
@@ -18,16 +18,13 @@ fn part_2(input: &str) -> String {
             }
 
             boxes
-        });
-
-    boxes
+        })
         .iter()
         .map(|(label, lenses)| {
-            let label = label + 1;
             lenses
                 .iter()
                 .enumerate()
-                .map(|(pos, lens)| label * (pos + 1) * lens.focal_length)
+                .map(|(pos, lens)| (label + 1) * (pos + 1) * lens.focal_length)
                 .sum::<usize>()
         })
         .sum::<usize>()
