@@ -5,6 +5,9 @@ fn part_2(input: &str) -> String {
 
     generate_all_starts(&grid)
         .iter()
+        .inspect(|a| {
+            dbg!(a);
+        })
         .map(|&(dir, pos)| get_number_energized_tiles(&grid, dir, pos))
         .inspect(|a| {
             dbg!(a);
@@ -20,14 +23,14 @@ fn generate_all_starts(grid: &[Vec<Tile>]) -> Vec<(Dir, Coord)> {
     (0..row_count)
         .flat_map(|index| {
             [
-                (Dir::Down, Coord(index as isize, 0)),
-                (Dir::Up, Coord(index as isize, row_count as isize - 1)),
+                (Dir::Right, Coord(index as isize, 0)),
+                (Dir::Left, Coord(index as isize, row_count as isize - 1)),
             ]
         })
         .chain((0..col_count).flat_map(|index| {
             [
-                (Dir::Left, Coord(col_count as isize - 1, index as isize)),
-                (Dir::Right, Coord(0, index as isize)),
+                (Dir::Up, Coord(col_count as isize - 1, index as isize)),
+                (Dir::Down, Coord(0, index as isize)),
             ]
         }))
         .collect()
@@ -53,35 +56,9 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_all_starts_small() {
-        let grid = parse_input("...\n...\n...");
+    fn test_generate_all_starts() {
+        let grid = parse_input(include_str!("input1.txt"));
         let all_starts = generate_all_starts(&grid);
-        assert_eq!(12, all_starts.len());
-        assert!([
-            (Dir::Down, Coord(0, 0)),
-            (Dir::Right, Coord(0, 0)),
-            (Dir::Right, Coord(0, 1)),
-            (Dir::Right, Coord(0, 2)),
-            (Dir::Up, Coord(0, 2)),
-            (Dir::Up, Coord(1, 2)),
-            (Dir::Up, Coord(2, 2)),
-            (Dir::Left, Coord(2, 2)),
-            (Dir::Left, Coord(2, 1)),
-            (Dir::Left, Coord(2, 0)),
-            (Dir::Down, Coord(2, 0)),
-            (Dir::Down, Coord(1, 0)),
-        ]
-        .iter()
-        .inspect(|dc| {
-            dbg!(&dc);
-        })
-        .all(|dc| all_starts.contains(dc)))
-    }
-
-    #[test]
-    fn test_generate_all_starts_example() {
-        let grid = parse_input(include_str!("input1_ex.txt"));
-        let all_starts = generate_all_starts(&grid);
-        assert_eq!(40, all_starts.len());
+        assert_eq!(110 * 4, all_starts.len());
     }
 }
