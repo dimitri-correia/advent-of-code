@@ -138,14 +138,14 @@ mod tests {
 
     #[test]
     fn example_test() {
-        let input = include_str!("input1_ex.txt"); // same file
+        let input = include_str!("input1_ex.txt");
         let r = part_2(input);
         assert_eq!("64", r);
     }
 
     #[test]
     fn test_3_cycles() {
-        let input = include_str!("input1_ex.txt"); // same file
+        let input = include_str!("input1_ex.txt");
         let mut grid = parse_input_col_row(input);
         let expected = [
             ".....#....\n....#...O#\n...OO##...\n.OO#......\n.....OOO#.\n.O#...O#.#\n....O#....\n......OOOO\n#...O###..\n#..OO#....",

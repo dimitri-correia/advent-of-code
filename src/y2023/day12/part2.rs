@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn example_test() {
         panic!();
-        let input = include_str!("input1_ex.txt"); // same file
+        let input = include_str!("input1_ex.txt");
         let r = part_2(input);
         assert_eq!("525152", r);
     }
