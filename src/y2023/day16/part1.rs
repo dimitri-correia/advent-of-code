@@ -22,7 +22,7 @@ fn part_1(input: &str) -> String {
         .to_string()
 }
 
-fn follow_path(grid: &Vec<Vec<Tile>>, energized: &mut HashSet<Position>, pos: Position) {
+fn follow_path(grid: &[Vec<Tile>], energized: &mut HashSet<Position>, pos: Position) {
     if energized.contains(&pos) {
         return;
     }
@@ -41,22 +41,19 @@ fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
     let new_cord = Coord(x, y);
     let tile = grid[x as usize][y as usize];
 
-    dbg!(&curr_pos);
-    dbg!(&tile);
-
     let new_dir = match tile {
         Tile::Empty => vec![curr_pos.dir],
         Tile::MirrorBLUR => match curr_pos.dir {
             Dir::Up => vec![Dir::Right],
             Dir::Down => vec![Dir::Left],
-            Dir::Left => vec![Dir::Up],
-            Dir::Right => vec![Dir::Down],
+            Dir::Left => vec![Dir::Down],
+            Dir::Right => vec![Dir::Up],
         },
         Tile::MirrorULBR => match curr_pos.dir {
             Dir::Up => vec![Dir::Left],
             Dir::Down => vec![Dir::Right],
-            Dir::Left => vec![Dir::Down],
-            Dir::Right => vec![Dir::Up],
+            Dir::Left => vec![Dir::Up],
+            Dir::Right => vec![Dir::Down],
         },
         Tile::SplitterH => match curr_pos.dir {
             Dir::Up | Dir::Down => vec![Dir::Right, Dir::Left],
