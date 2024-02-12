@@ -1,24 +1,13 @@
-use crate::y2023::day16::common::{get_dirs_from_tile, parse_input, Coord, Dir, Position, Tile};
-use std::collections::HashSet;
+use crate::y2023::day16::common::{get_number_energized_tiles, parse_input, Coord, Dir, Tile};
 
 fn part_2(input: &str) -> String {
     let grid = parse_input(input);
 
     generate_all_starts(&grid)
         .iter()
-        .map(|&(dir, pos)| {
-            let mut energized: HashSet<Position> = HashSet::new();
-            get_dirs_from_tile(&Position { pos, dir }, grid[0][0])
-                .iter()
-                .for_each(|&dir| {
-                    let pos = Position { pos, dir };
-                    follow_path(&grid, &mut energized, pos);
-                });
-            energized
-                .iter()
-                .map(|p| p.pos)
-                .collect::<HashSet<Coord>>()
-                .len()
+        .map(|&(dir, pos)| get_number_energized_tiles(&grid, dir, pos))
+        .inspect(|a| {
+            dbg!(a);
         })
         .max()
         .unwrap()
@@ -44,36 +33,6 @@ fn generate_all_starts(grid: &[Vec<Tile>]) -> Vec<(Dir, Coord)> {
         .collect()
 }
 
-fn follow_path(grid: &[Vec<Tile>], energized: &mut HashSet<Position>, pos: Position) {
-    if energized.contains(&pos) {
-        return;
-    }
-    energized.insert(pos);
-    get_next(&pos, &grid)
-        .iter()
-        .for_each(|&next_pos| follow_path(grid, energized, next_pos));
-}
-
-fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
-    let x = curr_pos.pos.0 + curr_pos.dir.coordinates().0;
-    let y = curr_pos.pos.1 + curr_pos.dir.coordinates().1;
-    if x < 0 || x as usize >= grid.len() || y < 0 || y as usize >= grid[0].len() {
-        return vec![];
-    }
-    let new_cord = Coord(x, y);
-    let tile = grid[x as usize][y as usize];
-
-    let new_dir = get_dirs_from_tile(curr_pos, tile);
-
-    new_dir
-        .iter()
-        .map(|dir| Position {
-            pos: new_cord,
-            dir: *dir,
-        })
-        .collect()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -94,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_all_starts() {
+    fn test_generate_all_starts_small() {
         let grid = parse_input("...\n...\n...");
         let all_starts = generate_all_starts(&grid);
         assert_eq!(12, all_starts.len());
@@ -117,5 +76,12 @@ mod tests {
             dbg!(&dc);
         })
         .all(|dc| all_starts.contains(dc)))
+    }
+
+    #[test]
+    fn test_generate_all_starts_example() {
+        let grid = parse_input(include_str!("input1_ex.txt"));
+        let all_starts = generate_all_starts(&grid);
+        assert_eq!(40, all_starts.len());
     }
 }
