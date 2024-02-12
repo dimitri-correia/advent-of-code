@@ -40,24 +40,11 @@ fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
             .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
         hashes.push(hash);
         if let Some(a) = a {
-            dbg!(&hash, &hashes);
-            let cycle_length = hashes.len() - a + 1;
-            dbg!(&cycle_length, (number_cycle - already_done_cycle));
-            let remaining = (number_cycle - already_done_cycle) % cycle_length;
-            dbg!(&remaining);
-            get_final_grid_getres(grid, remaining + 2);
+            let cycle_length = hashes.len() - a - 1;
+            let remaining = (number_cycle - already_done_cycle - 1) % cycle_length;
+            get_final_grid(grid, remaining);
             return;
         }
-    }
-}
-
-fn get_final_grid_getres(grid: &mut Grid, number_cycle: usize) {
-    for _ in 0..number_cycle {
-        do_quarter_of_tilt(grid, move_o_left);
-        do_quarter_of_tilt(grid, move_o_left);
-        do_quarter_of_tilt(grid, move_o_right);
-        do_quarter_of_tilt(grid, move_o_right);
-        dbg!(get_res(&mut grid.clone()));
     }
 }
 
@@ -146,7 +133,7 @@ mod tests {
         let input = include_str!("input1.txt");
         let output = part_2(input);
         dbg!(&output);
-        assert_eq!("val", output);
+        assert_eq!("87273", output);
     }
 
     #[test]
@@ -170,7 +157,6 @@ mod tests {
             let res = parse_input_col_row(ex);
             assert_eq!(res.order, grid.order);
             assert_eq!(res.grid, grid.grid);
-            dbg!("line ok");
         }
     }
 
