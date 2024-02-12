@@ -1,6 +1,4 @@
-use crate::y2023::day14::common::{
-    change_order_col_row, get_val_col, parse_input_col_row, Grid, Shape,
-};
+use crate::y2023::day14::common::{change_order_col_row, parse_input_col_row, Grid, Order, Shape};
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 fn part_2(input: &str) -> String {
@@ -12,11 +10,19 @@ fn part_2(input: &str) -> String {
     // also in row_col format
     get_final_grid(&mut grid, NUMBER_CYCLE);
 
+    get_res(&mut grid).to_string()
+}
+
+pub fn get_res(grid: &mut Grid) -> usize {
+    if grid.order == Order::RowCol {
+        change_order_col_row(grid);
+    };
     grid.grid
-        .into_iter()
-        .map(get_val_col) // todo
-        .sum::<usize>()
-        .to_string()
+        .iter()
+        .rev()
+        .enumerate()
+        .map(|(idx, col)| col.iter().filter(|s| s == &&Shape::RoundedRock).count() * (idx + 1))
+        .sum()
 }
 
 fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
@@ -32,14 +38,26 @@ fn get_final_grid(grid: &mut Grid, number_cycle: usize) {
             .iter()
             .enumerate()
             .find_map(|(idx, h)| if h == &hash { Some(idx) } else { None });
+        hashes.push(hash);
         if let Some(a) = a {
-            let cycle_length = hashes.len() - a;
+            dbg!(&hash, &hashes);
+            let cycle_length = hashes.len() - a + 1;
+            dbg!(&cycle_length, (number_cycle - already_done_cycle));
             let remaining = (number_cycle - already_done_cycle) % cycle_length;
             dbg!(&remaining);
-            get_final_grid(grid, remaining);
+            get_final_grid_getres(grid, remaining + 2);
             return;
         }
-        hashes.push(hash);
+    }
+}
+
+fn get_final_grid_getres(grid: &mut Grid, number_cycle: usize) {
+    for _ in 0..number_cycle {
+        do_quarter_of_tilt(grid, move_o_left);
+        do_quarter_of_tilt(grid, move_o_left);
+        do_quarter_of_tilt(grid, move_o_right);
+        do_quarter_of_tilt(grid, move_o_right);
+        dbg!(get_res(&mut grid.clone()));
     }
 }
 
@@ -123,14 +141,13 @@ mod tests {
     use crate::y2023::day14::common::{parse_char, parse_input_row_col, Order};
     use itertools::Itertools;
 
-    // #[test]
-    // fn actual_challenge() {
-    //     let input = include_str!("input1.txt");
-    //     let output = part_2(input);
-    //     dbg!(&output);
-    //     assert_eq!("val", output);
-    // }
-    //
+    #[test]
+    fn actual_challenge() {
+        let input = include_str!("input1.txt");
+        let output = part_2(input);
+        dbg!(&output);
+        assert_eq!("val", output);
+    }
 
     #[test]
     fn example_test() {
@@ -197,6 +214,15 @@ mod tests {
         let computed = move_o_left(&before);
 
         assert_eq!(expected, computed);
+    }
+
+    #[test]
+    fn test_get_res() {
+        let mut  grid = parse_input_row_col(
+            "OOOO.#.O..\nOO..#....#\nOO..O##..O\nO..#.OO...\n........#.\n..#....#.#\n..O..#.O.O\n..O.......\n#....###..\n#....#....\n",
+        );
+        let computed = get_res(&mut grid);
+        assert_eq!(136, computed);
     }
 
     fn _helper_print(v: &Grid) -> String {
