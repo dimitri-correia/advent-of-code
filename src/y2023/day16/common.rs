@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 pub fn get_number_energized_tiles(grid: &Vec<Vec<Tile>>, dir: Dir, pos: Coord) -> usize {
     let mut energized: HashSet<Position> = HashSet::new();
-    get_dirs_from_tile(&Position { pos, dir }, grid[0][0])
+    get_dirs_from_tile(&Position { pos, dir }, grid[pos.0 as usize][pos.1 as usize])
         .iter()
         .for_each(|&dir| {
             let pos = Position { pos, dir };
