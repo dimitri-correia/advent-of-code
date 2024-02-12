@@ -12,8 +12,6 @@ fn part_1(input: &str) -> String {
 
     follow_path(&grid, &mut energized, pos);
 
-    dbg!(&energized);
-
     energized
         .iter()
         .map(|p| p.pos)
