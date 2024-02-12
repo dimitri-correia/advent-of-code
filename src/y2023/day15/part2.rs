@@ -1,34 +1,37 @@
 use std::collections::HashMap;
 
 fn part_2(input: &str) -> String {
-    let mut boxes: HashMap<usize, Vec<Lens>> = HashMap::new();
+    let boxes = parse_input(input)
+        .iter()
+        .fold(HashMap::new(), |mut boxes, step| {
+            let lens_box: &mut Vec<Lens> = boxes.entry(compute_box_label(step)).or_default();
 
-    let steps = parse_input(input);
+            if step.label.contains('-') {
+                lens_box.retain(|b| !step.label.contains(&b.label));
+                return boxes;
+            }
 
-    for step in &steps {
-        let lens_box = boxes.entry(compute_box_label(step)).or_default();
+            if let Some(existing_lens) = lens_box.iter_mut().find(|l| l.label == step.label) {
+                existing_lens.focal_length = step.focal_length;
+            } else {
+                lens_box.push(step.clone());
+            }
 
-        if step.label.contains('-') {
-            lens_box.retain(|b| !step.label.contains(&b.label));
-            continue;
-        }
+            boxes
+        });
 
-        if let Some(existing_lens) = lens_box.iter_mut().find(|l| l.label == step.label) {
-            existing_lens.focal_length = step.focal_length;
-        } else {
-            lens_box.push(step.clone());
-        }
-    }
-
-    let mut r = 0;
-    for (label, lenses) in boxes {
-        let label = label + 1;
-        for (pos, lens) in lenses.iter().enumerate() {
-            r += label * (pos + 1) * lens.focal_length;
-        }
-    }
-
-    r.to_string()
+    boxes
+        .iter()
+        .map(|(label, lenses)| {
+            let label = label + 1;
+            lenses
+                .iter()
+                .enumerate()
+                .map(|(pos, lens)| label * (pos + 1) * lens.focal_length)
+                .sum::<usize>()
+        })
+        .sum::<usize>()
+        .to_string()
 }
 
 fn compute_box_label(step: &Lens) -> usize {
