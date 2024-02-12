@@ -150,7 +150,7 @@ mod tests {
         let input = include_str!("input1.txt");
         let output = part_1(input);
         dbg!(&output);
-        assert_eq!("val", output);
+        assert_eq!("7798", output);
     }
 
     #[test]
