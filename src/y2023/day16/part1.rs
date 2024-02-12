@@ -43,13 +43,13 @@ fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
 
     let new_dir = match tile {
         Tile::Empty => vec![curr_pos.dir],
-        Tile::MirrorBLUR => match curr_pos.dir {
+        Tile::MirrorLR => match curr_pos.dir {
             Dir::Up => vec![Dir::Right],
             Dir::Down => vec![Dir::Left],
             Dir::Left => vec![Dir::Down],
             Dir::Right => vec![Dir::Up],
         },
-        Tile::MirrorULBR => match curr_pos.dir {
+        Tile::MirrorRL => match curr_pos.dir {
             Dir::Up => vec![Dir::Left],
             Dir::Down => vec![Dir::Right],
             Dir::Left => vec![Dir::Up],
@@ -77,8 +77,8 @@ fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
 #[derive(Debug, Copy, Clone)]
 enum Tile {
     Empty,
-    MirrorBLUR,
-    MirrorULBR,
+    MirrorLR,
+    MirrorRL,
     SplitterH,
     SplitterV,
 }
@@ -86,8 +86,8 @@ enum Tile {
 fn parse_tile(c: char) -> Tile {
     match c {
         '.' => Tile::Empty,
-        '/' => Tile::MirrorBLUR,
-        '\\' => Tile::MirrorULBR,
+        '/' => Tile::MirrorLR,
+        '\\' => Tile::MirrorRL,
         '|' => Tile::SplitterV,
         '-' => Tile::SplitterH,
         _ => panic!(),
