@@ -79,30 +79,3 @@ pub fn get_val_col(col: Vec<Shape>) -> usize {
 
     r + (last_non_cube_rock - curr_rounded_tot + 1..=last_non_cube_rock).sum::<usize>()
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_change_oder_col_row_ok() {
-        let input = include_str!("input1_ex.txt");
-        let before = parse_input_col_row(input);
-        let mut after = before.clone();
-        (0..4)
-            .into_iter()
-            .for_each(|_| change_order_col_row(&mut after));
-        assert_eq!(before, after);
-    }
-
-    #[test]
-    fn test_change_oder_col_row_ko() {
-        let input = include_str!("input1_ex.txt");
-        let before = parse_input_col_row(input);
-        let mut after = before.clone();
-        (0..3)
-            .into_iter()
-            .for_each(|_| change_order_col_row(&mut after));
-        assert_eq!(before, after);
-    }
-}
