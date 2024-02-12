@@ -5,12 +5,21 @@ fn part_1(input: &str) -> String {
     let grid = parse_input(input);
 
     let mut energized: HashSet<Position> = HashSet::new();
-    let pos = Position {
-        pos: Coord(0, 0),
-        dir: Dir::Right,
-    };
 
-    follow_path(&grid, &mut energized, pos);
+    let coord = Coord(0, 0);
+
+    get_dirs_from_tile(
+        &Position {
+            pos: coord,
+            dir: Dir::Right,
+        },
+        grid[0][0],
+    )
+    .iter()
+    .for_each(|&dir| {
+        let pos = Position { pos: coord, dir };
+        follow_path(&grid, &mut energized, pos);
+    });
 
     energized
         .iter()
@@ -39,6 +48,18 @@ fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
     let new_cord = Coord(x, y);
     let tile = grid[x as usize][y as usize];
 
+    let new_dir = get_dirs_from_tile(curr_pos, tile);
+
+    new_dir
+        .iter()
+        .map(|dir| Position {
+            pos: new_cord,
+            dir: *dir,
+        })
+        .collect()
+}
+
+fn get_dirs_from_tile(curr_pos: &Position, tile: Tile) -> Vec<Dir> {
     let new_dir = match tile {
         Tile::Empty => vec![curr_pos.dir],
         Tile::MirrorLR => match curr_pos.dir {
@@ -62,14 +83,7 @@ fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
             _ => vec![curr_pos.dir],
         },
     };
-
     new_dir
-        .iter()
-        .map(|dir| Position {
-            pos: new_cord,
-            dir: *dir,
-        })
-        .collect()
 }
 
 #[derive(Debug, Copy, Clone)]
