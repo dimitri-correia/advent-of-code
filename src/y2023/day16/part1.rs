@@ -5,25 +5,12 @@ fn part_1(input: &str) -> String {
     let grid = parse_input(input);
 
     let mut energized: HashSet<Position> = HashSet::new();
-    let mut pos: HashSet<Position> = HashSet::new();
-
-    pos.insert(Position {
+    let pos = Position {
         pos: Coord(0, 0),
         dir: Dir::Right,
-    });
+    };
 
-    while let Some(curr_pos) = pos.iter().cloned().next() {
-        pos.remove(&curr_pos);
-        if energized.contains(&curr_pos) {
-            continue;
-        }
-
-        get_next(&curr_pos, &grid).iter().for_each(|n| {
-            pos.insert(*n);
-        });
-
-        energized.insert(curr_pos);
-    }
+    follow_path(&grid, &mut energized, pos);
 
     dbg!(&energized);
 
@@ -33,6 +20,16 @@ fn part_1(input: &str) -> String {
         .collect::<HashSet<Coord>>()
         .len()
         .to_string()
+}
+
+fn follow_path(grid: &Vec<Vec<Tile>>, energized: &mut HashSet<Position>, pos: Position) {
+    if energized.contains(&pos) {
+        return;
+    }
+    energized.insert(pos);
+    get_next(&pos, &grid)
+        .iter()
+        .for_each(|&next_pos| follow_path(grid, energized, next_pos));
 }
 
 fn get_next(curr_pos: &Position, grid: &[Vec<Tile>]) -> Vec<Position> {
