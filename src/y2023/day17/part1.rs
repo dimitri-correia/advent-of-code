@@ -18,6 +18,7 @@ fn part_1(input: &str) -> String {
         &mut explored,
         actual_heat_loss,
         min_heat_loss,
+        &mut vec![],
     )
     .to_string()
 }
@@ -28,7 +29,10 @@ fn explore_graph(
     explored: &mut Vec<Pos>,
     actual_heat_loss: u32,
     min_heat_loss: u32,
+    road: &mut Vec<String>,
 ) -> u32 {
+    dbg!(&road);
+
     let final_heat_loss = if is_starting_point(pos) {
         actual_heat_loss
     } else {
@@ -47,6 +51,7 @@ fn explore_graph(
         return u32::MAX;
     }
 
+    road.push(format!("{} - {}", pos.x, pos.y));
     explored.push(pos.clone());
 
     [Dir::Up, Dir::Down, Dir::Right, Dir::Left]
@@ -66,7 +71,14 @@ fn explore_graph(
                 y: new_y as usize,
                 consecutive: new_consecutive.unwrap(),
             };
-            explore_graph(lines, new_pos, explored, final_heat_loss, min_heat_loss)
+            explore_graph(
+                lines,
+                new_pos,
+                explored,
+                final_heat_loss,
+                min_heat_loss,
+                &mut road.clone(),
+            )
         })
         .min()
         .unwrap()
@@ -156,5 +168,12 @@ mod tests {
         let input = include_str!("input1_ex.txt");
         let r = part_1(input);
         assert_eq!("102", r);
+    }
+
+    #[test]
+    fn example_small() {
+        let input = "222\n333\n444";
+        let r = part_1(input);
+        assert_eq!("11", r);
     }
 }
