@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn part_1(input: &str) -> String {
     let lines = parse_input(input);
 
@@ -9,9 +11,14 @@ fn part_1(input: &str) -> String {
             direction: Dir::Right,
         },
     };
-    let mut explored = vec![];
+
+    let mut explored = HashMap::new();
+
+    explored.insert(start_pos, 0);
+
     let min_heat_loss: u32 = u32::MAX;
     let actual_heat_loss: u32 = 0;
+
     explore_graph(
         &lines,
         start_pos,
@@ -26,13 +33,11 @@ fn part_1(input: &str) -> String {
 fn explore_graph(
     lines: &[Vec<u32>],
     pos: Pos,
-    explored: &mut Vec<Pos>,
+    explored: &mut HashMap<Pos, u32>,
     actual_heat_loss: u32,
     min_heat_loss: u32,
     road: &mut Vec<String>,
 ) -> u32 {
-    dbg!(&road);
-
     let final_heat_loss = if is_starting_point(pos) {
         actual_heat_loss
     } else {
@@ -40,6 +45,7 @@ fn explore_graph(
     };
 
     if is_ending_point(pos, lines) {
+        dbg!(&road);
         return if final_heat_loss < min_heat_loss {
             final_heat_loss
         } else {
@@ -47,14 +53,16 @@ fn explore_graph(
         };
     }
 
-    if explored.contains(&pos) {
-        return u32::MAX;
+    if let Some(old) = explored.get(&pos) {
+        if old < &final_heat_loss {
+            return u32::MAX;
+        }
     }
 
-    road.push(format!("{} - {}", pos.x, pos.y));
-    explored.push(pos.clone());
+    road.push(format!("{} - {} - {}", pos.x, pos.y, lines[pos.x][pos.y]));
+    explored.insert(pos.clone(), final_heat_loss);
 
-    [Dir::Up, Dir::Down, Dir::Right, Dir::Left]
+    [Dir::Right, Dir::Down, Dir::Up, Dir::Left]
         .iter()
         .map(|dir| {
             let new_x = pos.x as isize + get_dir(dir).0;
@@ -110,20 +118,20 @@ fn outside_graph(lines: &[Vec<u32>], x: isize, y: isize) -> bool {
     x < 0 || y < 0 || x as usize > lines.len() - 1 || y as usize > lines[0].len() - 1
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 struct Pos {
     x: usize,
     y: usize,
     consecutive: Consecutive,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 struct Consecutive {
     number: u32,
     direction: Dir,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 enum Dir {
     Up,
     Down,
@@ -175,5 +183,12 @@ mod tests {
         let input = "222\n333\n444";
         let r = part_1(input);
         assert_eq!("11", r);
+    }
+
+    #[test]
+    fn example_small_2() {
+        let input = "22299\n33311\n44445";
+        let r = part_1(input);
+        assert_eq!("14", r);
     }
 }
