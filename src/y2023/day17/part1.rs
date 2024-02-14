@@ -14,20 +14,18 @@ fn part_1(input: &str) -> String {
 
     let mut explored = HashMap::new();
 
-    explored.insert(start_pos, 0);
-
     let min_heat_loss: u32 = u32::MAX;
     let actual_heat_loss: u32 = 0;
 
-    explore_graph(
+    (explore_graph(
         &lines,
         start_pos,
         &mut explored,
         actual_heat_loss,
         min_heat_loss,
         &mut vec![],
-    )
-    .to_string()
+    ) - lines[0][0])
+        .to_string()
 }
 
 fn explore_graph(
@@ -38,20 +36,7 @@ fn explore_graph(
     min_heat_loss: u32,
     road: &mut Vec<String>,
 ) -> u32 {
-    let final_heat_loss = if is_starting_point(pos) {
-        actual_heat_loss
-    } else {
-        actual_heat_loss + lines[pos.x][pos.y]
-    };
-
-    if is_ending_point(pos, lines) {
-        dbg!(&road);
-        return if final_heat_loss < min_heat_loss {
-            final_heat_loss
-        } else {
-            min_heat_loss
-        };
-    }
+    let final_heat_loss = actual_heat_loss + lines[pos.x][pos.y];
 
     if let Some(old) = explored.get(&pos) {
         if old < &final_heat_loss {
@@ -59,8 +44,24 @@ fn explore_graph(
         }
     }
 
-    road.push(format!("{} - {} - {}", pos.x, pos.y, lines[pos.x][pos.y]));
+    road.push(format!(
+        "{} - {} - {} - {}",
+        pos.x, pos.y, lines[pos.x][pos.y], final_heat_loss
+    ));
+
     explored.insert(pos.clone(), final_heat_loss);
+
+    if is_ending_point(pos, lines) {
+        // for last no need for direction
+        // todo
+        dbg!(&road);
+        dbg!(&explored.keys());
+        return if final_heat_loss < min_heat_loss {
+            final_heat_loss
+        } else {
+            min_heat_loss
+        };
+    }
 
     [Dir::Right, Dir::Down, Dir::Up, Dir::Left]
         .iter()
