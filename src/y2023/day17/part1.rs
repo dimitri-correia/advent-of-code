@@ -46,12 +46,14 @@ fn explore_graph(
     if is_ending_point(pos, lines) {
         dbg!(&final_heat_loss);
         dbg!(&road);
+        helper_print(road, lines);
+
         *min_heat_loss = final_heat_loss;
         return final_heat_loss;
     }
 
-    if let Some(old) = explored.get(&pos) {
-        if old < &final_heat_loss {
+    if let Some(old_min) = explored.get(&pos) {
+        if old_min <= &final_heat_loss {
             return u32::MAX;
         }
     }
@@ -90,6 +92,36 @@ fn explore_graph(
         })
         .min()
         .unwrap()
+}
+
+fn helper_print(road: &mut Vec<String>, grid: &[Vec<u32>]) {
+    let positions: Vec<(i32, i32)> = road
+        .iter()
+        .map(|l| {
+            let numbers: Vec<_> = l
+                .split('-')
+                .map(|s| s.trim().parse::<i32>().unwrap())
+                .collect();
+            (numbers[0], numbers[1])
+        })
+        .collect();
+
+    for (i, row) in grid.iter().enumerate() {
+        for (j, &cell) in row.iter().enumerate() {
+            let mut replaced = false;
+            for (x, y) in positions.iter() {
+                if (i as i32, j as i32) == (*x, *y) {
+                    print!("* ");
+                    replaced = true;
+                    break;
+                }
+            }
+            if !replaced {
+                print!("{} ", cell);
+            }
+        }
+        println!();
+    }
 }
 
 fn is_ending_point(pos: Pos, lines: &[Vec<u32>]) -> bool {
