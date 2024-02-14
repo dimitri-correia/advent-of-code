@@ -14,15 +14,16 @@ fn part_1(input: &str) -> String {
 
     let mut explored = HashMap::new();
 
-    let min_heat_loss: u32 = u32::MAX;
+    let mut min_heat_loss: u32 = u32::MAX;
     let actual_heat_loss: u32 = 0;
 
+    // explore graph - the value of the first element
     (explore_graph(
         &lines,
         start_pos,
         &mut explored,
         actual_heat_loss,
-        min_heat_loss,
+        &mut min_heat_loss,
         &mut vec![],
     ) - lines[0][0])
         .to_string()
@@ -33,10 +34,21 @@ fn explore_graph(
     pos: Pos,
     explored: &mut HashMap<Pos, u32>,
     actual_heat_loss: u32,
-    min_heat_loss: u32,
+    min_heat_loss: &mut u32,
     road: &mut Vec<String>,
 ) -> u32 {
     let final_heat_loss = actual_heat_loss + lines[pos.x][pos.y];
+
+    if final_heat_loss >= *min_heat_loss {
+        return u32::MAX;
+    }
+
+    if is_ending_point(pos, lines) {
+        dbg!(&final_heat_loss);
+        dbg!(&road);
+        *min_heat_loss = final_heat_loss;
+        return final_heat_loss;
+    }
 
     if let Some(old) = explored.get(&pos) {
         if old < &final_heat_loss {
@@ -44,24 +56,7 @@ fn explore_graph(
         }
     }
 
-    road.push(format!(
-        "{} - {} - {} - {}",
-        pos.x, pos.y, lines[pos.x][pos.y], final_heat_loss
-    ));
-
     explored.insert(pos.clone(), final_heat_loss);
-
-    if is_ending_point(pos, lines) {
-        // for last no need for direction
-        // todo
-        dbg!(&road);
-        dbg!(&explored.keys());
-        return if final_heat_loss < min_heat_loss {
-            final_heat_loss
-        } else {
-            min_heat_loss
-        };
-    }
 
     [Dir::Right, Dir::Down, Dir::Up, Dir::Left]
         .iter()
@@ -80,6 +75,10 @@ fn explore_graph(
                 y: new_y as usize,
                 consecutive: new_consecutive.unwrap(),
             };
+            road.push(format!(
+                "{} - {} - {} - {}",
+                pos.x, pos.y, lines[pos.x][pos.y], final_heat_loss
+            ));
             explore_graph(
                 lines,
                 new_pos,
@@ -93,24 +92,23 @@ fn explore_graph(
         .unwrap()
 }
 
-fn is_starting_point(pos: Pos) -> bool {
-    pos.x == 0 && pos.y == 0
-}
 fn is_ending_point(pos: Pos, lines: &[Vec<u32>]) -> bool {
     pos.x == lines.len() - 1 && pos.y == lines[0].len() - 1
 }
 
 fn get_new_consecutive(pos: &Pos, dir: &Dir) -> Option<Consecutive> {
     const MAX_NUMBER: u32 = 3;
-    let mut new_number = 0;
-    if pos.consecutive.direction == *dir {
-        if pos.consecutive.number + 1 == MAX_NUMBER {
-            return None;
-        }
-        new_number = pos.consecutive.number + 1;
+    if pos.consecutive.direction != *dir {
+        return Some(Consecutive {
+            number: 1,
+            direction: *dir,
+        });
+    }
+    if pos.consecutive.number + 1 == MAX_NUMBER {
+        return None;
     }
     Some(Consecutive {
-        number: new_number,
+        number: pos.consecutive.number + 1,
         direction: *dir,
     })
 }
