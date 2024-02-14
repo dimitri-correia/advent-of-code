@@ -1,5 +1,49 @@
 fn part_1(input: &str) -> String {
+    let dig_moves = parse_input(input);
+    dbg!(&dig_moves);
     "".to_string()
+}
+
+fn parse_input(input: &str) -> Vec<Instruction> {
+    input
+        .lines()
+        .map(|l| {
+            let mut parts = l.split_whitespace();
+            let direction = str_to_dir(parts.next().unwrap());
+            let value = parts.next().unwrap().parse::<u32>().unwrap();
+            let color = parts.next().unwrap().to_string();
+            Instruction {
+                direction,
+                value,
+                color,
+            }
+        })
+        .collect()
+}
+
+#[derive(Debug)]
+struct Instruction {
+    direction: Direction,
+    value: u32,
+    color: String,
+}
+
+#[derive(Debug)]
+enum Direction {
+    R,
+    D,
+    L,
+    U,
+}
+
+fn str_to_dir(s: &str) -> Direction {
+    match s {
+        "R" => Direction::R,
+        "D" => Direction::D,
+        "L" => Direction::L,
+        "U" => Direction::U,
+        _ => panic!(),
+    }
 }
 
 #[cfg(test)]
