@@ -8,6 +8,60 @@ fn part_1(input: &str) -> String {
     "".to_string()
 }
 
+fn count_point_inside(
+    pass: &[(usize, usize)],
+    line_vec: Vec<Vec<crate::y2023::day10::common::Pipe>>,
+) -> usize {
+    line_vec
+        .iter()
+        .enumerate()
+        .map(|(x, line)| count_line(pass, &x, line))
+        .sum()
+}
+
+fn count_line(
+    pass: &[(usize, usize)],
+    x: &usize,
+    line: &Vec<crate::y2023::day10::common::Pipe>,
+) -> usize {
+    let mut inside_loop = false;
+
+    let mut res = 0;
+
+    for (y, pipe) in line.iter().enumerate() {
+        if pass.contains(&(*x, y)) {
+            if change_in_out(pipe, line, y) {
+                inside_loop = !inside_loop;
+            }
+        } else if inside_loop {
+            res += 1;
+        }
+    }
+
+    res
+}
+
+fn change_in_out(
+    pipe: &crate::y2023::day10::common::Pipe,
+    line: &Vec<crate::y2023::day10::common::Pipe>,
+    y: usize,
+) -> bool {
+    let change_in_out = [
+        crate::y2023::day10::common::Pipe::Vertical,
+        crate::y2023::day10::common::Pipe::NorthEast,
+        crate::y2023::day10::common::Pipe::NorthWest,
+    ];
+    let change_in_out_if_start = [
+        crate::y2023::day10::common::Pipe::Vertical,
+        crate::y2023::day10::common::Pipe::SouthWest,
+        crate::y2023::day10::common::Pipe::SouthEast,
+    ];
+
+    change_in_out.contains(pipe)
+        || (pipe == &crate::y2023::day10::common::Pipe::StartingPosition
+            && (y != 0 && change_in_out_if_start.contains(line.get(y - 1).unwrap())))
+}
+
 fn get_boarders(dig_moves: Vec<Instruction>) -> Vec<(i32, i32)> {
     let mut pos = (0, 0);
 
