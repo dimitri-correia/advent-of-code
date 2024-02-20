@@ -1,7 +1,31 @@
 fn part_1(input: &str) -> String {
     let dig_moves = parse_input(input);
-    dbg!(&dig_moves);
+
+    let boarders = get_boarders(dig_moves);
+
+    dbg!(&boarders);
+
     "".to_string()
+}
+
+fn get_boarders(dig_moves: Vec<Instruction>) -> Vec<(i32, i32)> {
+    let mut pos = (0, 0);
+
+    let mut boarders = vec![pos];
+
+    for dig_move in dig_moves {
+        for _ in 0..dig_move.value {
+            match dig_move.direction {
+                Direction::U => pos.1 += 1,
+                Direction::D => pos.1 -= 1,
+                Direction::L => pos.0 -= 1,
+                Direction::R => pos.0 += 1,
+            }
+
+            boarders.push(pos)
+        }
+    }
+    boarders
 }
 
 fn parse_input(input: &str) -> Vec<Instruction> {
@@ -62,6 +86,6 @@ mod tests {
     fn example_test() {
         let input = include_str!("input1_ex.txt");
         let r = part_1(input);
-        assert_eq!("", r);
+        assert_eq!("62", r);
     }
 }
