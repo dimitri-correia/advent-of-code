@@ -1,65 +1,51 @@
+use itertools::Itertools;
+
 fn part_1(input: &str) -> String {
     let dig_moves = parse_input(input);
 
-    let boarders = get_boarders(dig_moves);
+    let boarders: Vec<(i32, i32)> = get_boarders(dig_moves);
 
-    dbg!(&boarders);
-
-    "".to_string()
+    get_all_positions_inside(&boarders).to_string()
 }
 
-fn count_point_inside(
-    pass: &[(usize, usize)],
-    line_vec: Vec<Vec<crate::y2023::day10::common::Pipe>>,
-) -> usize {
-    line_vec
-        .iter()
-        .enumerate()
-        .map(|(x, line)| count_line(pass, &x, line))
+fn get_all_positions_inside(boarders: &[(i32, i32)]) -> i32 {
+    let mut x_ordered = boarders.iter().sorted_by(|(a, _), (b, _)| a.cmp(b));
+    let x_min = x_ordered.next().unwrap().0;
+    let x_max = x_ordered.last().unwrap().0;
+
+    let mut y_ordered = boarders.iter().sorted_by(|(_, a), (_, b)| a.cmp(b));
+    let y_min = y_ordered.next().unwrap().1;
+    let y_max = y_ordered.last().unwrap().1;
+
+    (y_min..=y_max)
+        .map(|y| dbg!(compute_sum_for_line(boarders, x_min, x_max, y)))
         .sum()
 }
 
-fn count_line(
-    pass: &[(usize, usize)],
-    x: &usize,
-    line: &Vec<crate::y2023::day10::common::Pipe>,
-) -> usize {
-    let mut inside_loop = false;
+fn compute_sum_for_line(boarders: &[(i32, i32)], x_min: i32, x_max: i32, y: i32) -> i32 {
+    (x_min..=x_max)
+        .into_iter()
+        .fold((0, false, false), |(s, inside, prev_was_boarder), x| {
+            let is_border = boarders.contains(&(x, y));
 
-    let mut res = 0;
-
-    for (y, pipe) in line.iter().enumerate() {
-        if pass.contains(&(*x, y)) {
-            if change_in_out(pipe, line, y) {
-                inside_loop = !inside_loop;
+            if !is_border {
+                return if inside {
+                    (s + 1, inside, is_border)
+                } else {
+                    (s, inside, is_border)
+                };
             }
-        } else if inside_loop {
-            res += 1;
-        }
-    }
 
-    res
-}
-
-fn change_in_out(
-    pipe: &crate::y2023::day10::common::Pipe,
-    line: &Vec<crate::y2023::day10::common::Pipe>,
-    y: usize,
-) -> bool {
-    let change_in_out = [
-        crate::y2023::day10::common::Pipe::Vertical,
-        crate::y2023::day10::common::Pipe::NorthEast,
-        crate::y2023::day10::common::Pipe::NorthWest,
-    ];
-    let change_in_out_if_start = [
-        crate::y2023::day10::common::Pipe::Vertical,
-        crate::y2023::day10::common::Pipe::SouthWest,
-        crate::y2023::day10::common::Pipe::SouthEast,
-    ];
-
-    change_in_out.contains(pipe)
-        || (pipe == &crate::y2023::day10::common::Pipe::StartingPosition
-            && (y != 0 && change_in_out_if_start.contains(line.get(y - 1).unwrap())))
+            //is border true
+            if inside == prev_was_boarder {
+                return (s + 1, !inside, is_border);
+            }
+            if inside {
+                return (s + 1, false, is_border);
+            }
+            return (s + 1, true, is_border);
+        })
+        .0
 }
 
 fn get_boarders(dig_moves: Vec<Instruction>) -> Vec<(i32, i32)> {
@@ -141,5 +127,14 @@ mod tests {
         let input = include_str!("input1_ex.txt");
         let r = part_1(input);
         assert_eq!("62", r);
+    }
+
+    #[test]
+    fn test_one_line() {
+        // .###.#...
+        let boarders = [(1, 0), (2, 0), (3, 0), (5, 0)];
+        let computed = compute_sum_for_line(&boarders, 0, 8, 0);
+        let expected = 5;
+        assert_eq!(expected, computed);
     }
 }
