@@ -214,7 +214,7 @@ mod tests {
         let input = include_str!("input1.txt");
         let output = part_1(input);
         dbg!(&output);
-        assert_eq!("", output);
+        assert_eq!("401674", output);
     }
 
     #[test]
