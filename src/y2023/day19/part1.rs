@@ -2,10 +2,67 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 fn part_1(input: &str) -> String {
-    let (workflows, parts) = parse_input(input);
+    let (workflows, parts): (HashMap<String, Workflow>, Vec<Part>) = parse_input(input);
 
-    dbg!(workflows, parts);
-    "".to_string()
+    parts
+        .iter()
+        .filter_map(|p| follow_path(p, "in".to_string(), &workflows))
+        .sum::<usize>()
+        .to_string()
+}
+
+fn follow_path(
+    p: &Part,
+    condition_name: String,
+    workflows: &HashMap<String, Workflow>,
+) -> Option<usize> {
+    let met_condition = workflows
+        .get(&condition_name)
+        .unwrap()
+        .conditions
+        .iter()
+        .find(|condition| {
+            let rule = condition.rule;
+            if rule.cat == Cat::None {
+                return true;
+            }
+            let v = match rule.cat {
+                Cat::X => p.x,
+                Cat::M => p.m,
+                Cat::A => p.a,
+                Cat::S => p.s,
+                _ => panic!(),
+            };
+            match rule.comparator {
+                Ordering::Less => v < rule.value,
+                Ordering::Greater => v > rule.value,
+                _ => panic!(),
+            }
+        })
+        .unwrap();
+    let res = met_condition.decision.clone();
+    match res {
+        Res::A => Some(p.x + p.m + p.a + p.s),
+        Res::R => None,
+        Res::Continue(condition_name) => follow_path(p, condition_name, workflows),
+    }
+}
+
+#[derive(Debug, Clone)]
+enum Res {
+    A,
+    R,
+    Continue(String),
+}
+
+impl Res {
+    fn from_string(input: &str) -> Self {
+        match input {
+            "A" => Res::A,
+            "R" => Res::R,
+            _ => Res::Continue(input.to_string()),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -16,10 +73,10 @@ struct Workflow {
 #[derive(Debug)]
 struct Condition {
     rule: Rule,
-    decision: String,
+    decision: Res,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 struct Rule {
     cat: Cat,
     comparator: Ordering,
@@ -36,12 +93,12 @@ impl Condition {
             };
             return Condition {
                 rule,
-                decision: input.to_string(),
+                decision: Res::from_string(input),
             };
         }
         let mut split = input.split(':');
         let rule_part = split.next().unwrap();
-        let decision = split.next().unwrap().to_string();
+        let decision = Res::from_string(split.next().unwrap());
         let value = rule_part[2..].to_string().parse().unwrap();
         let rule_part_as_bytes = rule_part.as_bytes();
         let cat = match rule_part_as_bytes[0] {
@@ -52,8 +109,8 @@ impl Condition {
             _ => panic!(),
         };
         let comparator = match rule_part_as_bytes[1] {
-            b'<' => Ordering::Greater,
-            b'>' => Ordering::Less,
+            b'<' => Ordering::Less,
+            b'>' => Ordering::Greater,
             _ => panic!(),
         };
         let rule = Rule {
@@ -66,7 +123,7 @@ impl Condition {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 enum Cat {
     X,
     M,
