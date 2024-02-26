@@ -15,9 +15,16 @@ mod tests {
     }
 
     #[test]
-    fn example_test() {
-        let input = include_str!("input1_ex.txt");
+    fn example_test1() {
+        let input = include_str!("input1_ex1.txt");
         let r = part_1(input);
-        assert_eq!("", r);
+        assert_eq!("32000000", r);
+    }
+
+    #[test]
+    fn example_test2() {
+        let input = include_str!("input1_ex2.txt");
+        let r = part_1(input);
+        assert_eq!("11687500", r);
     }
 }
