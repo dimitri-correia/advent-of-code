@@ -1,9 +1,99 @@
 use std::collections::HashMap;
 
 fn part_1(input: &str) -> String {
-    let modules = parse_input(input);
+    let mut modules = parse_input(input);
     dbg!(&modules);
+
+    let mut next_step: Vec<(String, PulseType, String)> = vec![];
+
+    modules
+        .get("roadcaster")
+        .unwrap()
+        .destinations
+        .iter()
+        .for_each(|dest| next_step.push((dest.clone(), PulseType::Low, "roadcaster".to_string())));
+
+    for _a in 0..1 {
+        dbg!(&_a);
+        while !next_step.is_empty() {
+            dbg!(&next_step);
+            dbg!(&modules);
+            let (module_name, pulse_type, from) = next_step.pop().unwrap();
+
+            let new_pulse = modules
+                .get_mut(&module_name)
+                .unwrap()
+                .handle_pulse(pulse_type, from.clone());
+
+            if new_pulse.is_none() {
+                continue;
+            }
+            let new_pulse = new_pulse.unwrap();
+
+            modules
+                .get(&module_name)
+                .unwrap()
+                .destinations
+                .iter()
+                .for_each(|dest| next_step.push((dest.clone(), new_pulse, from.clone())))
+        }
+    }
+
     "".to_string()
+}
+
+#[derive(Debug, Clone)]
+enum ModuleType {
+    FlipFLop(bool),
+    Conjunction(LastsPulses),
+    Broadcaster,
+}
+
+#[derive(Debug, Clone)]
+struct LastsPulses {
+    lasts: HashMap<String, PulseType>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+enum PulseType {
+    Low,
+    High,
+}
+
+#[derive(Debug, Clone)]
+struct Module {
+    module_type: ModuleType,
+    destinations: Vec<String>,
+}
+
+impl Module {
+    fn handle_pulse(&mut self, pulse_type: PulseType, from: String) -> Option<PulseType> {
+        match &mut self.module_type {
+            ModuleType::FlipFLop(_) if pulse_type == PulseType::High => None,
+            ModuleType::FlipFLop(state) if pulse_type == PulseType::Low => {
+                *state = !*state;
+                if !*state {
+                    Some(PulseType::High)
+                } else {
+                    Some(PulseType::Low)
+                }
+            }
+            ModuleType::Conjunction(lasts_pulses) => {
+                *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
+                if lasts_pulses
+                    .lasts
+                    .iter()
+                    .all(|(_, p)| p == &PulseType::High)
+                {
+                    Some(PulseType::Low)
+                } else {
+                    Some(PulseType::High)
+                }
+            }
+            ModuleType::Broadcaster => Some(pulse_type),
+            _ => panic!(),
+        }
+    }
 }
 
 fn parse_input(input: &str) -> HashMap<String, Module> {
@@ -21,7 +111,7 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
                 .collect();
             let module_type = match source_dest.as_bytes()[0] {
                 b'&' => ModuleType::Conjunction(LastsPulses {
-                    lasts: destinations
+                    lasts: destinations // todo not supposed to be destinations here
                         .clone()
                         .into_iter()
                         .map(|d| (d, PulseType::Low))
@@ -40,59 +130,6 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
             )
         })
         .collect()
-}
-
-#[derive(Debug)]
-enum ModuleType {
-    FlipFLop(bool),
-    Conjunction(LastsPulses),
-    Broadcaster,
-}
-
-#[derive(Debug)]
-struct LastsPulses {
-    lasts: HashMap<String, PulseType>,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
-enum PulseType {
-    Low,
-    High,
-}
-
-#[derive(Debug)]
-struct Module {
-    module_type: ModuleType,
-    destinations: Vec<String>,
-}
-
-impl Module {
-    fn handle_pulse(mut self, pulse_type: PulseType, from: String) {
-        match (self.module_type, pulse_type) {
-            (ModuleType::FlipFLop(_), PulseType::High) => None,
-            (ModuleType::FlipFLop(state), PulseType::Low) => {
-                self.module_type = ModuleType::FlipFLop(!state);
-                if !state {
-                    Some(PulseType::High)
-                } else {
-                    Some(PulseType::Low)
-                }
-            }
-            (ModuleType::Conjunction(mut lasts_pulses), _) => {
-                *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
-                if lasts_pulses
-                    .lasts
-                    .iter()
-                    .all(|(_, p)| p == &PulseType::High)
-                {
-                    Some(PulseType::Low)
-                } else {
-                    Some(PulseType::High)
-                }
-            }
-            (ModuleType::Broadcaster, _) => Some(pulse_type),
-        };
-    }
 }
 
 #[cfg(test)]
