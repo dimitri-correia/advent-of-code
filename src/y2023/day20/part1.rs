@@ -12,11 +12,6 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
         .map(|l| {
             let mut parts = l.trim().split("->");
             let source_dest = parts.next().unwrap().trim();
-            let module_type = match source_dest.as_bytes()[0] {
-                b'&' => ModuleType::Conjunction,
-                b'%' => ModuleType::FlipFLop,
-                _ => ModuleType::Broadcaster,
-            };
             let name = (&source_dest[1..]).to_string();
             let destinations: Vec<String> = parts
                 .next()
@@ -24,6 +19,17 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
                 .split(',')
                 .map(|s| s.trim().to_string())
                 .collect();
+            let module_type = match source_dest.as_bytes()[0] {
+                b'&' => ModuleType::Conjunction(LastsPulses {
+                    lasts: destinations
+                        .clone()
+                        .into_iter()
+                        .map(|d| (d, PulseType::Low))
+                        .collect(),
+                }),
+                b'%' => ModuleType::FlipFLop(false),
+                _ => ModuleType::Broadcaster,
+            };
 
             (
                 name,
@@ -38,12 +44,17 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
 
 #[derive(Debug)]
 enum ModuleType {
-    FlipFLop,
-    Conjunction,
+    FlipFLop(bool),
+    Conjunction(LastsPulses),
     Broadcaster,
 }
 
 #[derive(Debug)]
+struct LastsPulses {
+    lasts: HashMap<String, PulseType>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 enum PulseType {
     Low,
     High,
@@ -56,15 +67,31 @@ struct Module {
 }
 
 impl Module {
-    fn handle_pulse(self: Self, pulse_type: PulseType) {
+    fn handle_pulse(mut self, pulse_type: PulseType, from: String) {
         match (self.module_type, pulse_type) {
-            (ModuleType::FlipFLop, PulseType::High) => {}
-            (ModuleType::FlipFLop, PulseType::Low) => {}
-            (ModuleType::Conjunction, PulseType::High) => {}
-            (ModuleType::Conjunction, PulseType::Low) => {}
-            (ModuleType::Broadcaster, PulseType::High) => {}
-            (ModuleType::Broadcaster, PulseType::Low) => {}
-        }
+            (ModuleType::FlipFLop(_), PulseType::High) => None,
+            (ModuleType::FlipFLop(state), PulseType::Low) => {
+                self.module_type = ModuleType::FlipFLop(!state);
+                if !state {
+                    Some(PulseType::High)
+                } else {
+                    Some(PulseType::Low)
+                }
+            }
+            (ModuleType::Conjunction(mut lasts_pulses), _) => {
+                *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
+                if lasts_pulses
+                    .lasts
+                    .iter()
+                    .all(|(_, p)| p == &PulseType::High)
+                {
+                    Some(PulseType::Low)
+                } else {
+                    Some(PulseType::High)
+                }
+            }
+            (ModuleType::Broadcaster, _) => Some(pulse_type),
+        };
     }
 }
 
