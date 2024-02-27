@@ -13,9 +13,9 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
             let mut parts = l.trim().split("->");
             let source_dest = parts.next().unwrap().trim();
             let module_type = match source_dest.as_bytes()[0] {
-                b'&' => Type::Conjunction,
-                b'%' => Type::FlipFLop,
-                _ => Type::Broadcaster,
+                b'&' => ModuleType::Conjunction,
+                b'%' => ModuleType::FlipFLop,
+                _ => ModuleType::Broadcaster,
             };
             let name = (&source_dest[1..]).to_string();
             let destinations: Vec<String> = parts
@@ -37,16 +37,35 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
 }
 
 #[derive(Debug)]
-enum Type {
+enum ModuleType {
     FlipFLop,
     Conjunction,
     Broadcaster,
 }
 
 #[derive(Debug)]
+enum PulseType {
+    Low,
+    High,
+}
+
+#[derive(Debug)]
 struct Module {
-    module_type: Type,
+    module_type: ModuleType,
     destinations: Vec<String>,
+}
+
+impl Module {
+    fn handle_pulse(self: Self, pulse_type: PulseType) {
+        match (self.module_type, pulse_type) {
+            (ModuleType::FlipFLop, PulseType::High) => {}
+            (ModuleType::FlipFLop, PulseType::Low) => {}
+            (ModuleType::Conjunction, PulseType::High) => {}
+            (ModuleType::Conjunction, PulseType::Low) => {}
+            (ModuleType::Broadcaster, PulseType::High) => {}
+            (ModuleType::Broadcaster, PulseType::Low) => {}
+        }
+    }
 }
 
 #[cfg(test)]
