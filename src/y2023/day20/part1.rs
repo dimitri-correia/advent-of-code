@@ -9,7 +9,6 @@ fn part_1(input: &str) -> String {
     let mut count_high = 0;
 
     for _a in 0..1000 {
-        dbg!(&_a);
         count_low += 1; //button -low-> broadcaster
         modules
             .get("roadcaster")
@@ -25,8 +24,11 @@ fn part_1(input: &str) -> String {
             });
 
         while !next_step.is_empty() {
-            dbg!(&next_step);
             let (module_name, pulse_type, from) = next_step.remove(0);
+
+            if !modules.contains_key(&module_name) {
+                continue;
+            }
 
             let new_pulse = modules
                 .get_mut(&module_name)
@@ -52,8 +54,6 @@ fn part_1(input: &str) -> String {
                 })
         }
     }
-
-    dbg!(&count_high, &count_low);
 
     (count_low * count_high).to_string()
 }
@@ -88,9 +88,7 @@ impl Module {
             ModuleType::FlipFLop(_) if pulse_type == PulseType::High => None,
             ModuleType::FlipFLop(state) => {
                 // pulse_type == PulseType::Low
-                dbg!(&state);
                 *state = !*state;
-                dbg!(&state);
                 // If it was off, it turns on and sends a high pulse.
                 // If it was on, it turns off and sends a low pulse.
                 if *state {
@@ -100,13 +98,7 @@ impl Module {
                 }
             }
             ModuleType::Conjunction(lasts_pulses) => {
-                dbg!(&lasts_pulses);
-                if lasts_pulses.lasts.contains_key(&from) {
-                    *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
-                } else {
-                    lasts_pulses.lasts.insert(from, pulse_type);
-                }
-                dbg!(&lasts_pulses);
+                *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
                 if lasts_pulses
                     .lasts
                     .iter()
@@ -123,7 +115,8 @@ impl Module {
 }
 
 fn parse_input(input: &str) -> HashMap<String, Module> {
-    input
+    let mut tmp: HashMap<String, Vec<String>> = HashMap::new();
+    let parsed: HashMap<String, Module> = input
         .lines()
         .map(|l| {
             let mut parts = l.trim().split("->");
@@ -143,6 +136,12 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
                 _ => ModuleType::Broadcaster,
             };
 
+            destinations.clone().into_iter().for_each(|d| {
+                tmp.entry(d.clone())
+                    .or_insert_with(Vec::new)
+                    .push(name.clone());
+            });
+
             (
                 name,
                 Module {
@@ -150,6 +149,27 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
                     destinations,
                 },
             )
+        })
+        .collect();
+
+    parsed
+        .into_iter()
+        .map(|(name, mut module)| match &mut module.module_type {
+            ModuleType::Conjunction(_) => (
+                name.clone(),
+                Module {
+                    module_type: ModuleType::Conjunction(LastsPulses {
+                        lasts: tmp
+                            .get(&(name.clone()))
+                            .unwrap()
+                            .iter()
+                            .flat_map(|n| vec![(n.clone(), PulseType::Low)])
+                            .collect(),
+                    }),
+                    destinations: module.destinations,
+                },
+            ),
+            _ => (name, module),
         })
         .collect()
 }
@@ -163,7 +183,7 @@ mod tests {
         let input = include_str!("input1.txt");
         let output = part_1(input);
         dbg!(&output);
-        assert_eq!("", output);
+        assert_eq!("739960225", output);
     }
 
     #[test]
