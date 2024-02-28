@@ -2,23 +2,31 @@ use std::collections::HashMap;
 
 fn part_1(input: &str) -> String {
     let mut modules = parse_input(input);
-    dbg!(&modules);
 
     let mut next_step: Vec<(String, PulseType, String)> = vec![];
 
-    modules
-        .get("roadcaster")
-        .unwrap()
-        .destinations
-        .iter()
-        .for_each(|dest| next_step.push((dest.clone(), PulseType::Low, "roadcaster".to_string())));
+    let mut count_low = 0;
+    let mut count_high = 0;
 
-    for _a in 0..1 {
+    for _a in 0..1000 {
         dbg!(&_a);
+        count_low += 1; //button -low-> broadcaster
+        modules
+            .get("roadcaster")
+            .unwrap()
+            .destinations
+            .iter()
+            .for_each(|dest| {
+                match PulseType::Low {
+                    PulseType::Low => count_low += 1,
+                    PulseType::High => count_high += 1,
+                };
+                next_step.push((dest.clone(), PulseType::Low, "roadcaster".to_string()));
+            });
+
         while !next_step.is_empty() {
             dbg!(&next_step);
-            dbg!(&modules);
-            let (module_name, pulse_type, from) = next_step.pop().unwrap();
+            let (module_name, pulse_type, from) = next_step.remove(0);
 
             let new_pulse = modules
                 .get_mut(&module_name)
@@ -35,11 +43,19 @@ fn part_1(input: &str) -> String {
                 .unwrap()
                 .destinations
                 .iter()
-                .for_each(|dest| next_step.push((dest.clone(), new_pulse, from.clone())))
+                .for_each(|dest| {
+                    match new_pulse {
+                        PulseType::Low => count_low += 1,
+                        PulseType::High => count_high += 1,
+                    };
+                    next_step.push((dest.clone(), new_pulse, module_name.clone()));
+                })
         }
     }
 
-    "".to_string()
+    dbg!(&count_high, &count_low);
+
+    (count_low * count_high).to_string()
 }
 
 #[derive(Debug, Clone)]
@@ -70,16 +86,27 @@ impl Module {
     fn handle_pulse(&mut self, pulse_type: PulseType, from: String) -> Option<PulseType> {
         match &mut self.module_type {
             ModuleType::FlipFLop(_) if pulse_type == PulseType::High => None,
-            ModuleType::FlipFLop(state) if pulse_type == PulseType::Low => {
+            ModuleType::FlipFLop(state) => {
+                // pulse_type == PulseType::Low
+                dbg!(&state);
                 *state = !*state;
-                if !*state {
+                dbg!(&state);
+                // If it was off, it turns on and sends a high pulse.
+                // If it was on, it turns off and sends a low pulse.
+                if *state {
                     Some(PulseType::High)
                 } else {
                     Some(PulseType::Low)
                 }
             }
             ModuleType::Conjunction(lasts_pulses) => {
-                *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
+                dbg!(&lasts_pulses);
+                if lasts_pulses.lasts.contains_key(&from) {
+                    *lasts_pulses.lasts.get_mut(&from).unwrap() = pulse_type;
+                } else {
+                    lasts_pulses.lasts.insert(from, pulse_type);
+                }
+                dbg!(&lasts_pulses);
                 if lasts_pulses
                     .lasts
                     .iter()
@@ -91,7 +118,6 @@ impl Module {
                 }
             }
             ModuleType::Broadcaster => Some(pulse_type),
-            _ => panic!(),
         }
     }
 }
@@ -111,11 +137,7 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
                 .collect();
             let module_type = match source_dest.as_bytes()[0] {
                 b'&' => ModuleType::Conjunction(LastsPulses {
-                    lasts: destinations // todo not supposed to be destinations here
-                        .clone()
-                        .into_iter()
-                        .map(|d| (d, PulseType::Low))
-                        .collect(),
+                    lasts: HashMap::new(),
                 }),
                 b'%' => ModuleType::FlipFLop(false),
                 _ => ModuleType::Broadcaster,
