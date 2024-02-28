@@ -9,53 +9,67 @@ fn part_1(input: &str) -> String {
     let mut count_high = 0;
 
     for _a in 0..1000 {
-        count_low += 1; //button -low-> broadcaster
+        handle_one_button_press(
+            &mut modules,
+            &mut next_step,
+            &mut count_low,
+            &mut count_high,
+        );
+    }
+
+    (count_low * count_high).to_string()
+}
+
+fn handle_one_button_press(
+    modules: &mut HashMap<String, Module>,
+    next_step: &mut Vec<(String, PulseType, String)>,
+    count_low: &mut i32,
+    count_high: &mut i32,
+) {
+    *count_low += 1; //button -low-> broadcaster
+    modules
+        .get("roadcaster")
+        .unwrap()
+        .destinations
+        .iter()
+        .for_each(|dest| {
+            match PulseType::Low {
+                PulseType::Low => *count_low += 1,
+                PulseType::High => *count_high += 1,
+            };
+            next_step.push((dest.clone(), PulseType::Low, "roadcaster".to_string()));
+        });
+
+    while !next_step.is_empty() {
+        let (module_name, pulse_type, from) = next_step.remove(0);
+
+        if !modules.contains_key(&module_name) {
+            continue;
+        }
+
+        let new_pulse = modules
+            .get_mut(&module_name)
+            .unwrap()
+            .handle_pulse(pulse_type, from.clone());
+
+        if new_pulse.is_none() {
+            continue;
+        }
+        let new_pulse = new_pulse.unwrap();
+
         modules
-            .get("roadcaster")
+            .get(&module_name)
             .unwrap()
             .destinations
             .iter()
             .for_each(|dest| {
-                match PulseType::Low {
-                    PulseType::Low => count_low += 1,
-                    PulseType::High => count_high += 1,
+                match new_pulse {
+                    PulseType::Low => *count_low += 1,
+                    PulseType::High => *count_high += 1,
                 };
-                next_step.push((dest.clone(), PulseType::Low, "roadcaster".to_string()));
-            });
-
-        while !next_step.is_empty() {
-            let (module_name, pulse_type, from) = next_step.remove(0);
-
-            if !modules.contains_key(&module_name) {
-                continue;
-            }
-
-            let new_pulse = modules
-                .get_mut(&module_name)
-                .unwrap()
-                .handle_pulse(pulse_type, from.clone());
-
-            if new_pulse.is_none() {
-                continue;
-            }
-            let new_pulse = new_pulse.unwrap();
-
-            modules
-                .get(&module_name)
-                .unwrap()
-                .destinations
-                .iter()
-                .for_each(|dest| {
-                    match new_pulse {
-                        PulseType::Low => count_low += 1,
-                        PulseType::High => count_high += 1,
-                    };
-                    next_step.push((dest.clone(), new_pulse, module_name.clone()));
-                })
-        }
+                next_step.push((dest.clone(), new_pulse, module_name.clone()));
+            })
     }
-
-    (count_low * count_high).to_string()
 }
 
 #[derive(Debug, Clone)]
@@ -116,6 +130,7 @@ impl Module {
 
 fn parse_input(input: &str) -> HashMap<String, Module> {
     let mut tmp: HashMap<String, Vec<String>> = HashMap::new();
+
     let parsed: HashMap<String, Module> = input
         .lines()
         .map(|l| {
@@ -128,15 +143,15 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
                 .split(',')
                 .map(|s| s.trim().to_string())
                 .collect();
-            let module_type = match source_dest.as_bytes()[0] {
-                b'&' => ModuleType::Conjunction(LastsPulses {
+            let module_type = match source_dest.chars().next().unwrap() {
+                '&' => ModuleType::Conjunction(LastsPulses {
                     lasts: HashMap::new(),
                 }),
-                b'%' => ModuleType::FlipFLop(false),
+                '%' => ModuleType::FlipFLop(false),
                 _ => ModuleType::Broadcaster,
             };
 
-            destinations.clone().into_iter().for_each(|d| {
+            destinations.iter().for_each(|d| {
                 tmp.entry(d.clone())
                     .or_insert_with(Vec::new)
                     .push(name.clone());
@@ -154,22 +169,21 @@ fn parse_input(input: &str) -> HashMap<String, Module> {
 
     parsed
         .into_iter()
-        .map(|(name, mut module)| match &mut module.module_type {
-            ModuleType::Conjunction(_) => (
-                name.clone(),
-                Module {
-                    module_type: ModuleType::Conjunction(LastsPulses {
-                        lasts: tmp
-                            .get(&(name.clone()))
-                            .unwrap()
-                            .iter()
-                            .flat_map(|n| vec![(n.clone(), PulseType::Low)])
-                            .collect(),
-                    }),
-                    destinations: module.destinations,
-                },
-            ),
-            _ => (name, module),
+        .map(|(name, mut module)| {
+            let new_module_type = match &mut module.module_type {
+                ModuleType::Conjunction(_) => {
+                    let lasts = tmp
+                        .get(&name)
+                        .unwrap()
+                        .iter()
+                        .map(|n| (n.clone(), PulseType::Low))
+                        .collect();
+                    ModuleType::Conjunction(LastsPulses { lasts })
+                }
+                _ => module.module_type.clone(),
+            };
+            module.module_type = new_module_type;
+            (name, module)
         })
         .collect()
 }
