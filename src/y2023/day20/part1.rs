@@ -27,49 +27,54 @@ fn handle_one_button_press(
     count_high: &mut i32,
 ) {
     *count_low += 1; //button -low-> broadcaster
-    modules
-        .get("roadcaster")
-        .unwrap()
-        .destinations
-        .iter()
-        .for_each(|dest| {
-            match PulseType::Low {
-                PulseType::Low => *count_low += 1,
-                PulseType::High => *count_high += 1,
-            };
-            next_step.push((dest.clone(), PulseType::Low, "roadcaster".to_string()));
-        });
+
+    generate_next_steps(
+        "roadcaster",
+        PulseType::Low,
+        modules,
+        next_step,
+        count_low,
+        count_high,
+    );
 
     while !next_step.is_empty() {
         let (module_name, pulse_type, from) = next_step.remove(0);
 
-        if !modules.contains_key(&module_name) {
-            continue;
+        if let Some(module) = modules.get_mut(&module_name) {
+            if let Some(new_pulse) = module.handle_pulse(pulse_type, from.clone()) {
+                generate_next_steps(
+                    &*module_name,
+                    new_pulse,
+                    modules,
+                    next_step,
+                    count_low,
+                    count_high,
+                );
+            }
         }
-
-        let new_pulse = modules
-            .get_mut(&module_name)
-            .unwrap()
-            .handle_pulse(pulse_type, from.clone());
-
-        if new_pulse.is_none() {
-            continue;
-        }
-        let new_pulse = new_pulse.unwrap();
-
-        modules
-            .get(&module_name)
-            .unwrap()
-            .destinations
-            .iter()
-            .for_each(|dest| {
-                match new_pulse {
-                    PulseType::Low => *count_low += 1,
-                    PulseType::High => *count_high += 1,
-                };
-                next_step.push((dest.clone(), new_pulse, module_name.clone()));
-            })
     }
+}
+
+fn generate_next_steps(
+    name: &str,
+    pulse_type: PulseType,
+    modules: &mut HashMap<String, Module>,
+    next_step: &mut Vec<(String, PulseType, String)>,
+    count_low: &mut i32,
+    count_high: &mut i32,
+) {
+    modules
+        .get(name)
+        .unwrap()
+        .destinations
+        .iter()
+        .for_each(|dest| {
+            match pulse_type {
+                PulseType::Low => *count_low += 1,
+                PulseType::High => *count_high += 1,
+            };
+            next_step.push((dest.clone(), pulse_type, name.to_string()));
+        });
 }
 
 #[derive(Debug, Clone)]
