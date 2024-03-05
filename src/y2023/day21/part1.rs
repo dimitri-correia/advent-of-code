@@ -43,7 +43,7 @@ fn print_final_grid(grid: &Vec<Vec<Tile>>, possible_pos: &Vec<Position>) {
 fn get_next(pos: Position, grid: &Vec<Vec<Tile>>, actual_pos: &mut Vec<Position>) {
     [(0, 1), (0, -1), (1, 0), (-1, 0)].iter().for_each(|mov| {
         let potential_pos = pos.move_dir(mov);
-        if is_pos_outside(potential_pos, &grid) || !is_walkable_position(grid, potential_pos) {
+        if is_pos_outside(potential_pos, &grid) || !is_walkable_position(grid, &potential_pos) {
             return;
         }
         if !actual_pos.contains(&potential_pos) {
@@ -52,7 +52,7 @@ fn get_next(pos: Position, grid: &Vec<Vec<Tile>>, actual_pos: &mut Vec<Position>
     });
 }
 
-fn is_walkable_position(grid: &Vec<Vec<Tile>>, potential_pos: Position) -> bool {
+fn is_walkable_position(grid: &Vec<Vec<Tile>>, potential_pos: &Position) -> bool {
     Tile::GardenPlot == grid[potential_pos.x as usize][potential_pos.y as usize]
 }
 
