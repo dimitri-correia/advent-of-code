@@ -46,7 +46,7 @@ pub fn parse_char_to_pipe(c: char) -> Pipe {
         'F' => Pipe::SouthEast,
         '.' => Pipe::Ground,
         'S' => Pipe::StartingPosition,
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }
 
@@ -133,6 +133,6 @@ fn get_positions(direction: &Pipe) -> ((isize, isize), (isize, isize)) {
         Pipe::NorthWest => ((-1, 0), (0, -1)),
         Pipe::SouthWest => ((1, 0), (0, -1)),
         Pipe::SouthEast => ((1, 0), (0, 1)),
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }

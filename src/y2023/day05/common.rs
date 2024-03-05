@@ -98,7 +98,7 @@ fn init_vec(input: &Input) -> Vec<Range<usize>> {
         .chunks(2)
         .map(|chunk| match chunk {
             [start, range] => *start..(*start + *range),
-            _ => panic!(),
+            _ => unreachable!(),
         })
         .collect()
 }
@@ -161,7 +161,7 @@ pub fn get_maps(input: &str) -> Input {
             "light-to-temperature" => &mut light_to_temperature,
             "temperature-to-humidity" => &mut temperature_to_humidity,
             "humidity-to-location" => &mut humidity_to_location,
-            _ => panic!(),
+            _ => unreachable!(),
         };
         update_vec(&mut lines, corresponding_vec);
     }

@@ -59,12 +59,12 @@ impl Condition {
             b'm' => Cat::M,
             b'a' => Cat::A,
             b's' => Cat::S,
-            _ => panic!(),
+            _ => unreachable!(),
         };
         let comparator = match rule_part_as_bytes[1] {
             b'<' => Ordering::Less,
             b'>' => Ordering::Greater,
-            _ => panic!(),
+            _ => unreachable!(),
         };
         let rule = Rule {
             cat,
@@ -118,7 +118,7 @@ impl Part {
                 "m" => part.m = value,
                 "a" => part.a = value,
                 "s" => part.s = value,
-                _ => panic!(),
+                _ => unreachable!(),
             }
         }
 

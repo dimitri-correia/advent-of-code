@@ -10,7 +10,7 @@ pub fn parse_char(c: char) -> Shape {
         'O' => Shape::RoundedRock,
         '.' => Shape::Empty,
         '#' => Shape::CubeRock,
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }
 

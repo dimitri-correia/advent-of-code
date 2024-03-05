@@ -24,7 +24,7 @@ pub fn parse_str_to_spring_state(c: char) -> SpringState {
         '#' => SpringState::KO,
         '.' => SpringState::OK,
         '?' => SpringState::Unknown,
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }
 

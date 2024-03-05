@@ -32,12 +32,12 @@ fn follow_path(
                 Cat::M => p.m,
                 Cat::A => p.a,
                 Cat::S => p.s,
-                _ => panic!(),
+                _ => unreachable!(),
             };
             match rule.comparator {
                 Ordering::Less => v < rule.value,
                 Ordering::Greater => v > rule.value,
-                _ => panic!(),
+                _ => unreachable!(),
             }
         })
         .unwrap();

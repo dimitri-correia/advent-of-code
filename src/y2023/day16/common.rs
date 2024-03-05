@@ -88,7 +88,7 @@ fn parse_tile(c: char) -> Tile {
         '\\' => Tile::MirrorRL,
         '|' => Tile::SplitterV,
         '-' => Tile::SplitterH,
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }
 

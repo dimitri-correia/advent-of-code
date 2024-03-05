@@ -32,7 +32,7 @@ fn print_final_grid(grid: &Vec<Vec<Tile>>, possible_pos: &Vec<Position>) {
                 match tile {
                     Tile::Rock => print!("#"),
                     Tile::GardenPlot => print!("."),
-                    _ => panic!(),
+                    _ => unreachable!(),
                 }
             }
         }
@@ -78,7 +78,7 @@ fn parse_input(input: &str) -> (Position, Vec<Vec<Tile>>) {
                         });
                         Tile::GardenPlot
                     }
-                    _ => panic!(),
+                    _ => unreachable!(),
                 })
                 .collect()
         })

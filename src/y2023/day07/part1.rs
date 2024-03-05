@@ -65,7 +65,7 @@ impl From<char> for Card {
             '4' => Card::Four,
             '3' => Card::Three,
             '2' => Card::Two,
-            _ => panic!(),
+            _ => unreachable!(),
         }
     }
 }

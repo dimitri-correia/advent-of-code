@@ -37,7 +37,7 @@ pub fn extract_game_info(line: &str) -> GameInfo {
                         "red" => Colors::R,
                         "green" => Colors::G,
                         "blue" => Colors::B,
-                        _ => panic!(),
+                        _ => unreachable!(),
                     };
                     (number, color)
                 })

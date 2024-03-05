@@ -106,7 +106,7 @@ fn str_to_dir(s: &str) -> Direction {
         "D" => Direction::D,
         "L" => Direction::L,
         "U" => Direction::U,
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }
 

@@ -55,7 +55,7 @@ impl FromStr for GameItems {
             "A" | "X" => Ok(GameItems::Rock),
             "B" | "Y" => Ok(GameItems::Paper),
             "C" | "Z" => Ok(GameItems::Scissors),
-            _ => panic!(),
+            _ => unreachable!(),
         }
     }
 }
@@ -68,7 +68,7 @@ impl FromStr for RoundResult {
             "X" => Ok(RoundResult::Loose),
             "Y" => Ok(RoundResult::Draw),
             "Z" => Ok(RoundResult::Win),
-            _ => panic!(),
+            _ => unreachable!(),
         }
     }
 }

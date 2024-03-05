@@ -74,12 +74,12 @@ fn get_new_range(old_range: &PartRange, rule: Rule) -> (PartRange, PartRange) {
     *pass_to_update = match rule.comparator {
         Ordering::Less => *pass_to_update.start()..=min(*pass_to_update.end(), rule.value),
         Ordering::Greater => max(*pass_to_update.start(), rule.value)..=*pass_to_update.end(),
-        _ => panic!(),
+        _ => unreachable!(),
     };
     *keep_to_update = match rule.comparator {
         Ordering::Greater => *keep_to_update.start()..=min(*keep_to_update.end(), rule.value),
         Ordering::Less => max(*keep_to_update.start(), rule.value)..=*keep_to_update.end(),
-        _ => panic!(),
+        _ => unreachable!(),
     };
     (range_to_pass, range_to_keep)
 }
@@ -93,7 +93,7 @@ fn get_part_of_range_to_update(
         Cat::M => &mut range_to_pass.m,
         Cat::A => &mut range_to_pass.a,
         Cat::S => &mut range_to_pass.s,
-        _ => panic!(),
+        _ => unreachable!(),
     };
     range_to_update
 }
