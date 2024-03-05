@@ -18,6 +18,6 @@ mod tests {
     fn example_test() {
         let input = include_str!("input1_ex.txt");
         let r = part_1(input);
-        assert_eq!("", r);
+        assert_eq!("94", r);
     }
 }
