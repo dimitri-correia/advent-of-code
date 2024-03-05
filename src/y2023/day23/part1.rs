@@ -1,5 +1,28 @@
 fn part_1(input: &str) -> String {
+    parse_input(input);
     "".to_string()
+}
+
+fn parse_input(input: &str) {
+    input
+        .lines()
+        .map(|l| l.chars().map(|c| {}).collect())
+        .collect()
+}
+
+#[derive(Debug)]
+enum Type {
+    Path,
+    Forest,
+    Slopes(SlopeType),
+}
+
+#[derive(Debug)]
+enum SlopeType {
+    Up,
+    Down,
+    Right,
+    Left,
 }
 
 #[cfg(test)]
