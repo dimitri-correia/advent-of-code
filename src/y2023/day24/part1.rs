@@ -1,4 +1,4 @@
-fn part_1(input: &str) -> String {
+fn part_1(input: &str, intersection: IntersectionBetween) -> String {
     let hails = parse_input(input);
 
     dbg!(&hails);
@@ -57,6 +57,12 @@ struct Velocity {
     vz: isize,
 }
 
+#[derive(Debug)]
+struct IntersectionBetween {
+    start: isize,
+    end: isize,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -64,7 +70,13 @@ mod tests {
     #[test]
     fn actual_challenge() {
         let input = include_str!("input1.txt");
-        let output = part_1(input);
+        let output = part_1(
+            input,
+            IntersectionBetween {
+                start: 200_000_000_000_000,
+                end: 400_000_000_000_000,
+            },
+        );
         dbg!(&output);
         assert_eq!("", output);
     }
@@ -72,7 +84,7 @@ mod tests {
     #[test]
     fn example_test() {
         let input = include_str!("input1_ex.txt");
-        let r = part_1(input);
+        let r = part_1(input, IntersectionBetween { start: 7, end: 27 });
         assert_eq!("", r);
     }
 }
