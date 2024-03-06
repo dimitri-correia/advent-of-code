@@ -1,9 +1,45 @@
-fn part_1(input: &str, intersection: IntersectionBetween) -> String {
+use itertools::Itertools;
+
+fn part_1(input: &str, time_frame: IntersectionBetween) -> String {
     let hails = parse_input(input);
 
     dbg!(&hails);
 
-    "".to_string()
+    let hails_move_in_time_frame = advance_hails_of(&hails, &time_frame);
+
+    dbg!(&hails_move_in_time_frame);
+
+    count_intersections(hails_move_in_time_frame).to_string()
+}
+
+fn count_intersections(hail: Vec<HailLine>) -> usize {
+    hail.iter()
+        .combinations(2)
+        .filter(|pair| intersect_exists_between(pair[0], pair[1]))
+        .count()
+}
+
+fn intersect_exists_between(line1: &HailLine, line2: &HailLine) -> bool {
+    todo!()
+}
+
+fn advance_hails_of(hails_before: &Vec<Hail>, time: &IntersectionBetween) -> Vec<HailLine> {
+    hails_before
+        .iter()
+        .map(|hail| {
+            let start = Pos {
+                px: hail.pos.px + time.start * hail.vel.vx,
+                py: hail.pos.py + time.start * hail.vel.vy,
+                pz: hail.pos.pz + time.start * hail.vel.vz,
+            };
+            let end = Pos {
+                px: start.px + time.end * hail.vel.vx,
+                py: start.py + time.end * hail.vel.vy,
+                pz: start.pz + time.end * hail.vel.vz,
+            };
+            HailLine { start, end }
+        })
+        .collect()
 }
 
 fn parse_input(input: &str) -> Vec<Hail> {
@@ -35,6 +71,12 @@ fn parse_pos(pos: &str) -> Pos {
         py: parts.next().unwrap().trim().parse().unwrap(),
         pz: parts.next().unwrap().trim().parse().unwrap(),
     }
+}
+
+#[derive(Debug)]
+struct HailLine {
+    start: Pos,
+    end: Pos,
 }
 
 #[derive(Debug)]
