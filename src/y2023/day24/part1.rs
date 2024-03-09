@@ -57,9 +57,6 @@ fn intersect_exists_between(line1: &HailLine, line2: &HailLine) -> bool {
     if (s_numer > denom) == denom_positive || (t_numer > denom) == denom_positive {
         return false;
     }
-    // Collision detected
-    // let t = t_numer / denom;
-    // dbg!((p0_x + t * s10_x), (p0_y + t * s10_y));
 
     true
 }
@@ -128,22 +125,22 @@ struct Hail {
 
 #[derive(Debug)]
 struct Pos {
-    px: i64,
-    py: i64,
-    pz: i64,
+    px: i128,
+    py: i128,
+    pz: i128,
 }
 
 #[derive(Debug)]
 struct Velocity {
-    vx: i64,
-    vy: i64,
-    vz: i64,
+    vx: i128,
+    vy: i128,
+    vz: i128,
 }
 
 #[derive(Debug)]
 struct IntersectionBetween {
-    start: i64,
-    end: i64,
+    start: i128,
+    end: i128,
 }
 
 #[cfg(test)]
