@@ -14,26 +14,18 @@ pub enum RoundResult {
     Loose = 0,
 }
 
-pub trait GetRoundResult {
-    fn get_round_result(&self, opponent: &Self) -> RoundResult;
-    fn get_move_for_result(&self, result: &RoundResult) -> Self;
-}
-
-impl GetRoundResult for GameItems {
-    fn get_round_result(&self, opponent: &Self) -> RoundResult {
-        if opponent == self {
-            RoundResult::Draw
-        } else if let (GameItems::Paper, GameItems::Rock)
-        | (GameItems::Scissors, GameItems::Paper)
-        | (GameItems::Rock, GameItems::Scissors) = (opponent, self)
-        {
-            RoundResult::Loose
-        } else {
-            RoundResult::Win
+impl GameItems {
+    pub fn get_round_result(&self, opponent: &Self) -> RoundResult {
+        match (self, opponent) {
+            (s, o) if s == o => RoundResult::Draw,
+            (GameItems::Paper, GameItems::Rock)
+            | (GameItems::Scissors, GameItems::Paper)
+            | (GameItems::Rock, GameItems::Scissors) => RoundResult::Win,
+            _ => RoundResult::Loose,
         }
     }
 
-    fn get_move_for_result(&self, result: &RoundResult) -> Self {
+    pub fn get_move_for_result(&self, result: &RoundResult) -> Self {
         match (self, result) {
             (_, &RoundResult::Draw) => self.clone(),
             (GameItems::Rock, &RoundResult::Loose) | (GameItems::Paper, &RoundResult::Win) => {
