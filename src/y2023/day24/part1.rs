@@ -173,135 +173,38 @@ mod tests {
 
     #[test]
     fn test_line_intersection() {
-        assert!(intersect_exists_between(
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 2,
-                    py: 0,
-                    pz: 0
-                }
+        let line1 = |sx, sy, ex, ey| HailLine {
+            start: Pos {
+                px: sx,
+                py: sy,
+                pz: 0,
             },
-            &HailLine {
-                start: Pos {
-                    px: 1,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 1,
-                    py: 1,
-                    pz: 0
-                }
-            }
+            end: Pos {
+                px: ex,
+                py: ey,
+                pz: 0,
+            },
+        };
+
+        assert!(intersect_exists_between(
+            &line1(0, 0, 2, 0),
+            &line1(1, 0, 1, 1)
         ));
         assert!(intersect_exists_between(
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 3,
-                    py: 3,
-                    pz: 0
-                }
-            },
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 3,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 3,
-                    py: 0,
-                    pz: 0
-                }
-            }
+            &line1(0, 0, 3, 3),
+            &line1(0, 3, 3, 0)
         ));
         assert!(!intersect_exists_between(
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 1,
-                    py: 0,
-                    pz: 0
-                }
-            },
-            &HailLine {
-                start: Pos {
-                    px: 2,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 0,
-                    py: 0,
-                    pz: 0
-                }
-            }
+            &line1(0, 0, 1, 0),
+            &line1(2, 0, 0, 0)
         ));
         assert!(!intersect_exists_between(
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 1,
-                    py: 0,
-                    pz: 0
-                }
-            },
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 1,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 1,
-                    py: 1,
-                    pz: 0
-                }
-            }
+            &line1(0, 1, 1, 1),
+            &line1(0, 0, 1, 0)
         ));
         assert!(!intersect_exists_between(
-            &HailLine {
-                start: Pos {
-                    px: 0,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 0,
-                    py: 1,
-                    pz: 0
-                }
-            },
-            &HailLine {
-                start: Pos {
-                    px: 1,
-                    py: 0,
-                    pz: 0
-                },
-                end: Pos {
-                    px: 1,
-                    py: 1,
-                    pz: 0
-                }
-            }
+            &line1(0, 0, 0, 1),
+            &line1(1, 0, 1, 1)
         ));
     }
 }
