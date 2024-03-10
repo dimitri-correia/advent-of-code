@@ -13,20 +13,18 @@ fn part_1(input: &str) -> String {
     };
 
     let mut explored = HashMap::new();
-
     let mut min_heat_loss: u32 = u32::MAX;
-    let actual_heat_loss: u32 = 0;
 
-    // explore graph - the value of the first element
-    (explore_graph(
+    explore_graph(
         &lines,
         start_pos,
         &mut explored,
-        actual_heat_loss,
+        0,
         &mut min_heat_loss,
-        &mut vec![],
-    ) - lines[0][0])
-        .to_string()
+        vec![],
+    );
+
+    (min_heat_loss - lines[0][0]).to_string()
 }
 
 fn explore_graph(
@@ -35,12 +33,12 @@ fn explore_graph(
     explored: &mut HashMap<Pos, u32>,
     actual_heat_loss: u32,
     min_heat_loss: &mut u32,
-    road: &mut Vec<String>,
-) -> u32 {
+    road: Vec<String>,
+) {
     let final_heat_loss = actual_heat_loss + lines[pos.x][pos.y];
 
     if final_heat_loss >= *min_heat_loss {
-        return u32::MAX;
+        return;
     }
 
     if is_ending_point(pos, lines) {
@@ -49,12 +47,12 @@ fn explore_graph(
         helper_print(road, lines);
 
         *min_heat_loss = final_heat_loss;
-        return final_heat_loss;
+        return;
     }
 
     if let Some(old_min) = explored.get(&pos) {
         if old_min <= &final_heat_loss {
-            return u32::MAX;
+            return;
         }
     }
 
@@ -62,22 +60,23 @@ fn explore_graph(
 
     [Dir::Right, Dir::Down, Dir::Up, Dir::Left]
         .iter()
-        .map(|dir| {
+        .for_each(|dir| {
             let new_x = pos.x as isize + get_dir(dir).0;
             let new_y = pos.y as isize + get_dir(dir).1;
             if outside_graph(&lines, new_x, new_y) {
-                return u32::MAX;
+                return;
             }
             let new_consecutive = get_new_consecutive(&pos, dir);
             if new_consecutive.is_none() {
-                return u32::MAX;
+                return;
             }
             let new_pos = Pos {
                 x: new_x as usize,
                 y: new_y as usize,
                 consecutive: new_consecutive.unwrap(),
             };
-            road.push(format!(
+            let mut new_road = road.clone();
+            new_road.push(format!(
                 "{} - {} - {} - {}",
                 pos.x, pos.y, lines[pos.x][pos.y], final_heat_loss
             ));
@@ -87,14 +86,12 @@ fn explore_graph(
                 explored,
                 final_heat_loss,
                 min_heat_loss,
-                &mut road.clone(),
+                new_road,
             )
-        })
-        .min()
-        .unwrap()
+        });
 }
 
-fn helper_print(road: &mut Vec<String>, grid: &[Vec<u32>]) {
+fn helper_print(road: Vec<String>, grid: &[Vec<u32>]) {
     let positions: Vec<(i32, i32)> = road
         .iter()
         .map(|l| {
@@ -136,7 +133,7 @@ fn get_new_consecutive(pos: &Pos, dir: &Dir) -> Option<Consecutive> {
             direction: *dir,
         });
     }
-    if pos.consecutive.number + 1 == MAX_NUMBER {
+    if pos.consecutive.number + 1 > MAX_NUMBER {
         return None;
     }
     Some(Consecutive {
