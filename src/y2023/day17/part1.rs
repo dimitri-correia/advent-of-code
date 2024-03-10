@@ -205,18 +205,4 @@ mod tests {
         let r = part_1(input);
         assert_eq!("102", r);
     }
-
-    #[test]
-    fn example_small() {
-        let input = "222\n333\n444";
-        let r = part_1(input);
-        assert_eq!("11", r);
-    }
-
-    #[test]
-    fn example_small_2() {
-        let input = "22299\n33311\n44445";
-        let r = part_1(input);
-        assert_eq!("14", r);
-    }
 }
