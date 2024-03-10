@@ -1,10 +1,10 @@
+use crate::y2022::day04::common::get_elves_ranges;
+
 fn part_2(input: &str) -> String {
     input
         .lines()
-        .filter(|l| {
-            let (elf_a, elf_b) = l.split_once(',').unwrap();
-            let elf_a = get_elf_range(elf_a);
-            let elf_b = get_elf_range(elf_b);
+        .filter(|&l| {
+            let (elf_a, elf_b) = get_elves_ranges(l);
             overlap(elf_a, elf_b)
         })
         .count()
@@ -15,10 +15,6 @@ fn overlap(a: (usize, usize), b: (usize, usize)) -> bool {
     b.0 <= a.1 && b.1 >= a.0
 }
 
-fn get_elf_range(elf_a: &str) -> (usize, usize) {
-    let (elf_start, elf_end) = elf_a.split_once('-').unwrap();
-    (elf_start.parse().unwrap(), elf_end.parse().unwrap())
-}
 #[cfg(test)]
 mod tests {
     use super::*;
