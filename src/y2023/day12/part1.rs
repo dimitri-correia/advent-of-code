@@ -1,6 +1,4 @@
-use crate::y2023::day12::common::{
-    count_unknown, get_nb_arrangements, parse_str_to_spring_state, Line, SpringState,
-};
+use crate::y2023::day12::common::{parse_str_to_spring_state, Line, SpringState};
 
 fn part_1(input: &str) -> String {
     parse_input(input)
@@ -10,25 +8,24 @@ fn part_1(input: &str) -> String {
         .to_string()
 }
 
+fn get_nb_arrangements(p0: &Line) -> B {
+    todo!()
+}
+
 fn parse_input(input: &str) -> Vec<Line> {
     input
         .lines()
         .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            let line_state: Vec<SpringState> = parts[0]
+            let (line_state, order) = line.split_once(' ').unwrap();
+            let line_state: Vec<SpringState> = line_state
                 .chars()
                 .map(|c| parse_str_to_spring_state(c))
                 .collect();
-            let order: Vec<usize> = parts[1]
+            let order: Vec<usize> = order
                 .split(',')
                 .map(|s| s.parse::<usize>().unwrap())
                 .collect();
-            let count_unknown = count_unknown(&line_state);
-            Line {
-                line_state,
-                order,
-                count_unknown,
-            }
+            Line { line_state, order }
         })
         .collect()
 }
