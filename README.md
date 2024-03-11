@@ -2,8 +2,11 @@
 
 ## Score
 
-- 2023: wip (35 stars)
-- 2022: wip (4 stars)
+[![advent-of-code](https://img.shields.io/badge/Advent_of_Code-2023-F80046.svg)](https://adventofcode.com/2023)
+wip (35 ⭐️)
+
+[![advent-of-code](https://img.shields.io/badge/Advent_of_Code-2022-F80046.svg)](https://adventofcode.com/2022)
+wip (8 ⭐️)
 
 ## Rust
 
