@@ -36,7 +36,7 @@ mod tests {
         let input = include_str!("input1.txt");
         let output = part_2(input);
         dbg!(&output);
-        assert_eq!("", output);
+        assert_eq!("6720660274964", output);
     }
 
     #[test]
