@@ -42,9 +42,14 @@ fn explore_graph(
     }
 
     if is_ending_point(pos, lines) {
+        let mut new_road = road.clone();
+        new_road.push(format!(
+            "{} - {} - {} - {}",
+            pos.x, pos.y, lines[pos.x][pos.y], final_heat_loss
+        ));
         dbg!(&final_heat_loss);
-        dbg!(&road);
-        helper_print(road, lines);
+        dbg!(&new_road);
+        helper_print(new_road, lines);
 
         *min_heat_loss = final_heat_loss;
         return;
