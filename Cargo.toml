@@ -1,9 +1,25 @@
-[package]
-name = "advent-of-code"
-version = "0.1.0"
+[workspace]
+resolver = "2"
+members = [
+    "advent_of_code/advent_of_code_y2015",
+    "advent_of_code/advent_of_code_y2016",
+    "advent_of_code/advent_of_code_y2017",
+    "advent_of_code/advent_of_code_y2018",
+    "advent_of_code/advent_of_code_y2019",
+    "advent_of_code/advent_of_code_y2020",
+    "advent_of_code/advent_of_code_y2021",
+    "advent_of_code/advent_of_code_y2022",
+    "advent_of_code/advent_of_code_y2023",
+    "advent_of_code/advent_of_code_y2024",
+    "advent_of_code/aoc_helper",
+    "executor",
+]
+
+[workspace.package]
 edition = "2021"
+version = "0.1.0"
+authors = ["Dimitri CORREIA"]
+repository = "dim-advent-of-code-and-katas"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-itertools = { version = "0.12.1", features = [] }
+[workspace.dependencies]
+itertools = { version = "0.13.0", features = [] }

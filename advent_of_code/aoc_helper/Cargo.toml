@@ -1,0 +1,12 @@
+[package]
+name = "aoc_helper"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+reqwest = { version = "0.12.9", features = ["json"] }
+tokio = { version = "1.41.1", features = ["full"] }
+scraper = "0.21.0"
+html2md = "0.2.14"

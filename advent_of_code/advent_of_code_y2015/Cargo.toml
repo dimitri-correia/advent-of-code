@@ -1,0 +1,10 @@
+[package]
+name = "advent_of_code_y2015"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+md5 = "0.7.0"
+itertools = { workspace = true }

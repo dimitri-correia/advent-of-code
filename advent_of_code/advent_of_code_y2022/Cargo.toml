@@ -1,0 +1,9 @@
+[package]
+name = "advent_of_code_y2022"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+itertools = { workspace = true }

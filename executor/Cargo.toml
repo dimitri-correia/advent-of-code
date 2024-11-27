@@ -1,0 +1,18 @@
+[package]
+name = "executor"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+advent_of_code_y2015 = { path = "../advent_of_code/advent_of_code_y2015" }
+advent_of_code_y2016 = { path = "../advent_of_code/advent_of_code_y2016" }
+advent_of_code_y2017 = { path = "../advent_of_code/advent_of_code_y2017" }
+advent_of_code_y2018 = { path = "../advent_of_code/advent_of_code_y2018" }
+advent_of_code_y2019 = { path = "../advent_of_code/advent_of_code_y2019" }
+advent_of_code_y2020 = { path = "../advent_of_code/advent_of_code_y2020" }
+advent_of_code_y2021 = { path = "../advent_of_code/advent_of_code_y2021" }
+advent_of_code_y2022 = { path = "../advent_of_code/advent_of_code_y2022" }
+advent_of_code_y2023 = { path = "../advent_of_code/advent_of_code_y2023" }
+advent_of_code_y2024 = { path = "../advent_of_code/advent_of_code_y2024" }
