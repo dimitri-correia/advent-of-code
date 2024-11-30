@@ -1,3 +1,5 @@
+use super::common::get_number_possibilities;
+
 pub fn part_1_example() -> String {
     let input = include_str!("input1_ex.txt");
     let total_amount = 25;
@@ -11,23 +13,9 @@ pub fn part_1_actual_challenge() -> String {
 }
 
 fn part_1(input: &str, total_amount: u32) -> String {
-    let mut containers: Vec<u32> = input.lines().map(|line| line.parse().unwrap()).collect();
-    containers.sort_unstable_by(|a, b| b.cmp(a)); // Sort in descending order
-    let mut nb_possibilities = 0;
+    let possibilities = get_number_possibilities(input, total_amount);
 
-    let mut stack = vec![(0, 0)];
-    while let Some((current_sum, start_index)) = stack.pop() {
-        for i in start_index..containers.len() {
-            let new_sum = current_sum + containers[i];
-            if new_sum == total_amount {
-                nb_possibilities += 1;
-            } else if new_sum < total_amount {
-                stack.push((new_sum, i + 1));
-            }
-        }
-    }
-
-    nb_possibilities.to_string()
+    possibilities.len().to_string()
 }
 
 #[cfg(test)]

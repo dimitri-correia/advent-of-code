@@ -30,7 +30,6 @@ fn part_1(input: &str) -> String {
                 sum += curr * sign;
                 curr = 0;
                 sign = 1;
-                continue;
             }
         }
     }
