@@ -6,7 +6,7 @@ use std::{fs::File, io::Write};
 use crate::utils::get_headers;
 
 pub async fn fetch_challenges() -> Result<(), Error> {
-    for year in 2015..=2024 {
+    for year in (2015..=2024).rev() {
         let dir_name = format!("advent_of_code/advent_of_code_y{}", year);
         if !std::fs::metadata(&dir_name).is_ok() {
             Command::new("cargo")
@@ -75,7 +75,12 @@ pub async fn fetch_challenges() -> Result<(), Error> {
 
             std::fs::write(md_file_path, markdown_content).unwrap();
 
-            if std::fs::metadata(format!("{}/input1.txt", dir_path)).is_err() {
+            let path_input_file = format!("{}/input1.txt", dir_path);
+            if std::fs::metadata(&path_input_file).is_err()
+                || std::fs::read(path_input_file)
+                    .unwrap()
+                    .starts_with("Please don't repeatedly request".as_bytes())
+            {
                 std::fs::write(format!("{}/input1_ex.txt", dir_path), "").unwrap();
                 let input_url = format!("{}/input", url);
                 let input_response = reqwest::Client::new()

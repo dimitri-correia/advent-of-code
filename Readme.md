@@ -28,9 +28,9 @@
 0 ⭐️ (0%)
 
 [![advent-of-code](https://img.shields.io/badge/Advent_of_Code-2015-F80046.svg)](https://adventofcode.com/2015)
-35 ⭐️ (70%)
+40 ⭐️ (80%)
 
 ## Total Stars
 
-79 ⭐️ (15%)
+84 ⭐️ (16%)
 
